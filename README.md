@@ -1,15 +1,45 @@
-# CN Agent — JP 管理员登记工具 v3.0
+# CN Agent — 新 CN MAC 完整安装包 v3.0
 
-为新 CN MAC 签发设备证书和独立 Magpie Gateway Key。**新 CN 不需要也不应取得 JP SSH 登录权限。**
+在新 CN MAC 安装受控 Claude、Magpie、日本出口及依赖。新 CN 不需要 JP 的 SSH 账号、密码或登录密钥。
 
-## 下载
+## 新 CN 下载
+
+- **[完整安装包（约 338 MB，Apple Silicon + Intel）](https://github.com/saltonzhang/cnagent/releases/download/v3.0.0/CN-MAC-AI-DEPLOYMENT-KIT.zip)**
+- [SHA-256 校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.0.0/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
+- **[给安装 AI 阅读的手册](CN-MAC-AI-DEPLOYMENT.md)**
+- [版本下载页](https://github.com/saltonzhang/cnagent/releases/tag/v3.0.0)
+
+包内含 iTerm2、Claude 原生程序、独立 Magpie、Python 和出口程序，无需预装 Node/Homebrew。固定兼容版本与适用范围见手册。Codex 工具及受控 VS Code 未完成适配，不宣称支持。
+
+将下面的指令交给新 CN 的 AI：
+
+> 根据仓库 CN-MAC-AI-DEPLOYMENT.md，下载 v3.0.0 完整 CN 安装包并核对校验值，安装所有依赖并生成设备申请。不要 SSH 登录 JP 或索取 JP 登录信息。等待管理员提供签名接入包后，导入并继续安装，完成实际链路和界面验收；不能把等待授权算作安装成功。密码和 Key 不要输出到聊天。
+
+也可在新 CN 的普通管理员终端下载：
+
+```bash
+mkdir -p ~/Downloads/cnagent-v3
+cd ~/Downloads/cnagent-v3
+curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.0.0/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.0.0/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
+cd installer/fleet-kit
+bash install.sh
+```
+
+第一次运行准备本机并生成申请文件，管理员签发后再运行 `bash install.sh --access-bundle /绝对路径/设备.access.json`。管理员默认将 Key 包含在接入包中，CN 自动配置；若省略 Key，则通过 CN 本机隐藏输入填写。不要把接入包或 Key 提交到仓库。
+
+## 管理员签发
+
+### 管理员工具下载
 
 - [管理员工具包 ZIP](https://github.com/saltonzhang/cnagent/raw/refs/heads/main/JP-MAC-ENROLLMENT-ADMIN-KIT.zip)
 - [SHA-256 校验文件](https://github.com/saltonzhang/cnagent/raw/refs/heads/main/JP-MAC-ENROLLMENT-ADMIN-KIT.zip.sha256)
 - [完整签发手册](JP-MAC-DEVICE-ENROLLMENT.md)
 - [对应源码](jp-admin-kit/)
 
-本仓库仅发布管理员工具，不含 CN 端完整软件安装包。工具使用已有 JP 服务，不安装或替换 JP Magpie。
+管理员工具使用已有 JP 服务，不安装或替换 JP Magpie。完整 CN 安装包在上方 Release 下载。
 
 ## 最新流程
 
