@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "files": {
+    "magpie-darwin-amd64.zip": {
+      "version": "0.1.3032",
+      "sha256": "bcba53dd8dedf4c1b74e4946a94afe4e8170518baeeff0925adffe2e23d07849",
+      "source": "https://github.com/yetone/magpie-releases/releases/download/v0.1.3032/magpie-darwin-amd64.zip",
+      "upstreamIntegrity": "sha256:bcba53dd8dedf4c1b74e4946a94afe4e8170518baeeff0925adffe2e23d07849",
+      "signerTeam": "LY7MVTUDZG"
+    },
+    "magpie-darwin-arm64.zip": {
+      "version": "0.1.3032",
+      "sha256": "b8235934edf33d095836a3c5095409b28f82aad1ef5daa83587f7bf122d8399e",
+      "source": "https://github.com/yetone/magpie-releases/releases/download/v0.1.3032/magpie-darwin-arm64.zip",
+      "upstreamIntegrity": "sha256:b8235934edf33d095836a3c5095409b28f82aad1ef5daa83587f7bf122d8399e",
+      "signerTeam": "LY7MVTUDZG"
+    },
+    "claude-arm64.tgz": {
+      "version": "2.1.198",
+      "sha256": "2b983c0730e13f9d21728fbbf2a4d94c0eff342c30b77b0aa7c681a1f01cc274",
+      "source": "https://registry.npmjs.org/@anthropic-ai/claude-code-darwin-arm64/-/claude-code-darwin-arm64-2.1.198.tgz",
+      "upstreamIntegrity": "sha512-6omNnK8MblrYGHs8I0B7wwl8mGXBH9+ilBYK6Jl1WJnA8SpFAqomwmZO2wmaR18pcueaSD56J3W8tTBaNtx7Eg==",
+      "signerTeam": "Q6L2SF6YDW"
+    },
+    "claude-amd64.tgz": {
+      "version": "2.1.198",
+      "sha256": "aceabb1657fe7e75917a776257971479691534ed781f25caa1cebb9c0a420ad1",
+      "source": "https://registry.npmjs.org/@anthropic-ai/claude-code-darwin-x64/-/claude-code-darwin-x64-2.1.198.tgz",
+      "upstreamIntegrity": "sha512-R1jzAJnr+6TzPrER3hSJafuCGBy6Zvt+RnDslKCK5Hu4fSjpeoE1JwUy1PI4ZX7JamfNvickg4myVGccRUZB3w==",
+      "signerTeam": "Q6L2SF6YDW"
+    },
+    "python.pkg": {
+      "version": "3.14.10",
+      "sha256": "286c7018aa2730f6747ca433dccdc2b31be45f078a9ea0ffa44d5f06368fd2d7",
+      "source": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-macos11.pkg",
+      "signerTeam": "BMM5U3QVKW"
+    },
+    "iterm.zip": {
+      "version": "3.7.7",
+      "sha256": "549eb2b21464d7f4606165e51c36a6b1a252ac9a79958228a240152412759da2",
+      "source": "https://iterm2.com/downloads/stable/iTerm2-3_7_7.zip",
+      "signerTeam": "H7V7XYVQ7D"
+    }
+  }
+}

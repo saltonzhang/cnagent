@@ -1,0 +1,6 @@
+pass out quick on lo0 proto tcp from any to 127.0.0.1 port {@@CN_API_PORT@@, @@API_ADAPTER_PORT@@, @@WEB_PROXY_PORT@@} user @@AGENT_USER@@ flags any keep state
+pass out quick on lo0 proto tcp from 127.0.0.1 port @@CN_API_PORT@@ to 127.0.0.1 user @@AGENT_USER@@ flags any keep state
+pass out quick on lo0 proto tcp from 127.0.0.1 port {@@API_ADAPTER_PORT@@, @@WEB_PROXY_PORT@@} to 127.0.0.1 user @@NETWORK_USER@@ flags any keep state
+block return out quick on lo0 proto tcp from any to 127.0.0.1 port {@@CN_API_PORT@@, @@API_ADAPTER_PORT@@, @@WEB_PROXY_PORT@@}
+pass out quick proto tcp from any to @@JP_HOST@@ port {@@JP_API_PORT@@, @@JP_EGRESS_PORT@@} user @@NETWORK_USER@@ flags any keep state
+block return out quick proto {tcp, udp} user {@@AGENT_USER@@, @@NETWORK_USER@@}

@@ -1,27 +1,27 @@
-# CN Agent — 新 CN MAC 完整安装包 v3.0.1
+# CN Agent — 新 CN MAC 完整安装包 v3.0.2
 
 在新 CN MAC 安装受控 Claude、Magpie、日本出口及依赖。新 CN 不需要 JP 的 SSH 账号、密码或登录密钥。
 
 ## 新 CN 下载
 
-- **[完整安装包（约 338 MB，Apple Silicon + Intel）](https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip)**
-- [SHA-256 校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
+- **[完整安装包（约 338 MB，Apple Silicon + Intel）](https://github.com/saltonzhang/cnagent/releases/download/v3.0.2/CN-MAC-AI-DEPLOYMENT-KIT.zip)**
+- [SHA-256 校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.0.2/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
 - **[给安装 AI 阅读的手册](CN-MAC-AI-DEPLOYMENT.md)**
-- [版本下载页](https://github.com/saltonzhang/cnagent/releases/tag/v3.0.1)
+- [版本下载页](https://github.com/saltonzhang/cnagent/releases/tag/v3.0.2)
 
 包内含 iTerm2、Claude 原生程序、独立 Magpie、Python 和出口程序，无需预装 Node/Homebrew。固定兼容版本与适用范围见手册。Codex 工具及受控 VS Code 未完成适配，不宣称支持。
 
 将下面的指令交给新 CN 的 AI：
 
-> 根据仓库 CN-MAC-AI-DEPLOYMENT.md，下载 v3.0.1 完整 CN 安装包并核对校验值，安装所有依赖并生成设备申请。不要 SSH 登录 JP 或索取 JP 登录信息。等待管理员提供签名接入包后，导入并继续安装，完成实际链路和界面验收；不能把等待授权算作安装成功。密码和 Key 不要输出到聊天。
+> 根据仓库 CN-MAC-AI-DEPLOYMENT.md，下载 v3.0.2 完整 CN 安装包并核对校验值，安装所有依赖并生成设备申请。不要 SSH 登录 JP 或索取 JP 登录信息。等待管理员提供签名接入包后，导入并继续安装，完成实际链路和界面验收；不能把等待授权算作安装成功。密码和 Key 不要输出到聊天。
 
 也可在新 CN 的普通管理员终端下载：
 
 ```bash
 mkdir -p ~/Downloads/cnagent-v3
 cd ~/Downloads/cnagent-v3
-curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
-curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.0.2/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.0.2/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
 cd installer/fleet-kit
@@ -85,3 +85,11 @@ python3 admin/issue_access.py --request /绝对路径/设备.request.json --out 
 - 不重建 WireGuard，不建立 SSH 数据隧道，不修改 JP 翻译、门禁、审计和现有开关。具体前置条件、审批、撤销和维护见手册。
 
 版本日期：2026-11-18。
+
+## v3.0.2 安装权限修复与验证范围
+
+v3.0.1 在严格 umask 下将受控运行目录创建为 root-only，并遗漏专用账户 `.local`、`.config` 父目录所有权，导致降权服务无法访问。v3.0.2 显式设置运行目录为 root-owned 0755、私有目录为 0700，并逐级设置专用账户目录为该账户所有的 0700；不递归修改既有数据。只对本安装器识别的同设备安装恢复，仍拒绝接管试点和同名未知账户。
+
+已完成本机权限修复后的 PF、端口账户隔离、私钥读取限制、受控网络负向测试和日本出口验收；真实 Claude 回复和工具调用仍失败，原因待定位，iTerm2 界面/退格键验收仍未完成。本版本不宣称整套环境已经通过验收。回归测试覆盖 umask 077、新建/恢复、父目录服务 UID 所有权及符号链接拒绝；不替代目标机实际验收。
+
+源码在 `fleet-kit/`；Git 仓库不包含大型软件和出口二进制，实际安装必须下载同版本完整 Release ZIP 并校验，不能直接运行不完整源码目录。旧 v3.0.1 附件保留供追溯，不覆盖。已安装设备请读取同版本手册后以原设备参数重跑安装入口恢复权限，并重新做全部验收；不要手动删除状态或重新生成身份。

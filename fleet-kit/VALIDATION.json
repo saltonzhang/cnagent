@@ -1,0 +1,142 @@
+{
+  "date": "2026-11-18",
+  "kitVersion": "3.0.2",
+  "purpose": "Offline administrator-approved enrollment; new CN never logs into JP",
+  "pythonHelperTests": {
+    "count": 9,
+    "passed": true,
+    "managementPython": "3.8",
+    "coverage": [
+      "parameter substitution and generated syntax",
+      "unsafe input rejection",
+      "existing output protection",
+      "idempotent enrollment",
+      "different CSR cannot silently rotate",
+      "two-process registration preserves existing serials",
+      "targeted revoke preserves other identities",
+      "Go-generated CA interoperability",
+      "invalid registry refuses mutation",
+      "registry cannot export arbitrary files"
+    ]
+  },
+  "transportGoTests": {
+    "count": 10,
+    "race": true,
+    "passed": true
+  },
+  "livePilotRuntimeVerifiedPreviously": true,
+  "freshAdditionalCNInstalledByThisDocumentationTask": false,
+  "parameterizedPrivilegedInstallerImplemented": true,
+  "newCNKernelAndGUIAcceptanceRequired": true,
+  "CodexToolsQualified": false,
+  "currentSupportedWorkflow": "controlled Claude; normal VS Code cannot use JP Magpie",
+  "privateKeysOrPasswordsIncluded": false,
+  "importantLimits": [
+    "sandbox-exec is version-specific legacy mechanism",
+    "new privileged installer is covered by isolated tests; no fresh second-CN system installation was executed",
+    "root/administrator and malicious GUI delegation are outside claimed isolation",
+    "shared certificate/key one-to-one binding is not implemented",
+    "active CONNECT/WebSocket revocation may need coordinated disconnection",
+    "certificate renewal is not automatic",
+    "project ACLs and old sessions require explicit scope",
+    "network isolation does not imply full filesystem containment",
+    "software installers are bundled, but local CN administrator authorization, JP-side administrator approval and target GUI acceptance remain necessary"
+  ],
+  "binaries": {
+    "arm64": {
+      "path": "bin/wg-transport-darwin-arm64",
+      "sha256": "54a138343ab6118d4830cf804cb0826a23f9054401b58009328e80d7a194a729",
+      "signature": "ad-hoc; integrity only",
+      "freshCNSystemInstallTested": false
+    },
+    "amd64": {
+      "path": "bin/wg-transport-darwin-amd64",
+      "sha256": "ae8a8a1459f2a61b59a46e14f9d700d9174453ee5b91e624bf748b9b67b78596",
+      "signature": "ad-hoc; integrity only",
+      "freshCNSystemInstallTested": false
+    }
+  },
+  "amd64NativeCLIStartupPassed": true,
+  "nonAdminUnattendedLauncherQualified": false,
+  "generatedSeatbeltSyntaxValidatedOnManagementHostExample": true,
+  "generatedLaunchdPlistLintPassedOnManagementHostExample": true,
+  "installerUnitTests": {
+    "count": 13,
+    "passed": true,
+    "coverage": [
+      "asset corruption/symlink rejection",
+      "unmanaged account refusal",
+      "account identity drift refusal",
+      "configuration phase preconditions",
+      "atomic no-symlink writes",
+      "no embedded private credentials",
+      "real OpenSSL certificate enrollment + idempotent captured gateway key in temporary JP layout",
+      "JP binary pin drift refusal",
+      "specific PF block counter parsing",
+      "existing PF root anchor is never reloaded",
+      "active or nonempty custom root policy cannot be replaced",
+      "fresh disabled PF initializes filter anchor only without flushing NAT"
+    ]
+  },
+  "bundledSoftware": {
+    "architectures": [
+      "arm64",
+      "amd64"
+    ],
+    "allRequiredBaselineInstallersIncluded": true,
+    "lock": "software/LOCK.json",
+    "PythonPackageSHA256MatchesOfficialRelease": true,
+    "PythonPackageSignatureAndNotarizationVerified": true,
+    "iTermAndBothMagpieAndBothClaudeSignaturesVerified": true,
+    "amd64ClaudeAndMagpieVersionStartupVerified": true
+  },
+  "installerPlanExecutedWithoutSystemMutation": true,
+  "livePilotOrdinaryPortProbes": {
+    "allThreeConnectionsDenied": true,
+    "kernelRuleCountersObserved": true,
+    "socketFailureWasTimeoutNotErrnoEPERM": true,
+    "acceptanceRequiresPerPortPFCounterIncreaseAndAgentPositiveControl": true
+  },
+  "CNJPLoginRequired": false,
+  "CNJPLoginCredentialsIncluded": false,
+  "productionJPChangedInThisRevision": false,
+  "productionEnrollmentTestedInThisRevision": false,
+  "offlineEnrollmentTests": {
+    "count": 19,
+    "passed": true,
+    "cryptography": "real OpenSSL ECDSA test CA, dedicated RSA codeSigning signer, real CSR/client certificate",
+    "gatewayCLI": "temporary mock, not production",
+    "coverage": [
+      "administrator issuance and idempotent resume",
+      "revoked identity cannot reuse output",
+      "automatic API Key import",
+      "optional hidden API Key input",
+      "reject noninteractive Key input",
+      "reject tampering, expiration, wrong request, wrong CA, wrong client certificate",
+      "TLS client identity cannot sign access bundle",
+      "root repeats verification before modifying files",
+      "private-key mismatch preserves active certificate",
+      "no JP SSH invocation or login flag in CN installer"
+    ]
+  },
+  "permissionRegressionTests": {
+    "count": 3,
+    "passed": true,
+    "coverage": [
+      "umask 077 creation and managed resume",
+      "explicit service UID ownership of every parent",
+      "symlink directory refusal"
+    ]
+  },
+  "secondCNObserved": {
+    "architecture": "amd64",
+    "macOS": "13.0.1",
+    "localPermissionRepairApplied": true,
+    "networkChecksPassed": true,
+    "realClaudeReply": false,
+    "realToolTaskCompleted": false,
+    "GUIAcceptanceComplete": false,
+    "installationComplete": false,
+    "newReleaseFullSystemRetest": false
+  }
+}

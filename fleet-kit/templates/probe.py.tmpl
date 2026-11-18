@@ -1,0 +1,18 @@
+import socket,subprocess,json,argparse,hashlib
+p=argparse.ArgumentParser();p.add_argument('--public-check',action='store_true');a=p.parse_args();out={}
+# Default negative tests contact only owned JP/private or local destinations.
+for name,family,kind,target in [('oldJP',socket.AF_INET,socket.SOCK_STREAM,('@@JP_HOST@@',3425)),('otherLocalProxy',socket.AF_INET,socket.SOCK_STREAM,('127.0.0.1',18080)),('ipv6Loopback',socket.AF_INET6,socket.SOCK_STREAM,('::1',18082)),('udpLoopback',socket.AF_INET,socket.SOCK_DGRAM,('127.0.0.1',18082)),('dnsIPC',socket.AF_UNIX,socket.SOCK_STREAM,'/var/run/mDNSResponder')]:
+ s=socket.socket(family,kind);s.settimeout(2)
+ try:
+  if kind==socket.SOCK_DGRAM:s.sendto(b'owned-endpoint-probe',target)
+  else:s.connect(target)
+  out[name+'Blocked']=False
+ except OSError as e:out[name+'Blocked']=e.errno in (1,13)
+ finally:s.close()
+if a.public_check:
+ r=subprocess.run(['/usr/bin/curl','--proxy','http://127.0.0.1:@@WEB_PROXY_PORT@@','--noproxy','','--fail','--silent','--show-error','--connect-timeout','5','--max-time','15','https://ipinfo.io/json'],capture_output=True,text=True)
+ try:
+  x=json.loads(r.stdout);out.update(proxySucceeded=r.returncode==0,country=x.get('country'),city=x.get('city'),ipSHA256=hashlib.sha256(x['ip'].encode()).hexdigest() if x.get('ip') else None)
+ except Exception:out.update(proxySucceeded=False,exit=r.returncode)
+else:out['publicCheck']='not_requested'
+print(json.dumps(out))

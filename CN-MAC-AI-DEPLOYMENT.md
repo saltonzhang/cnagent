@@ -1,12 +1,12 @@
 # CN MAC 安装部署手册：交给 AI 执行
 
-手册/发行版 3.0.1（仅文档修订，运行时基线 3.0）· 2026-11-18。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
+手册/发行版 3.0.2（修复 CN 安装目录权限，运行时基线 3.0）· 2026-11-18。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
 
 ## 直接交给另一台电脑的 AI
 
 新 CN 不必先手动复制安装包。把下面这段指令发给有本机终端权限的 AI，它应先从 GitHub 读取本手册，再下载同版 Release。已复制文件的离线方式仍可使用。
 
-> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.0.1 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；拿到签名接入包后继续安装。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
+> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.0.2 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；拿到签名接入包后继续安装。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
 
 执行 AI 需要有这台 CN MAC 的终端执行权限；只有聊天能力不能安装。软件已随包携带，不要求新电脑预先安装 Homebrew、Node 或 Python。CN 只需要本机管理员授权；JP 的管理认证仅发生在管理员自己的电脑或 JP 本机，不能在新 CN 上进行。设备授权仍需要管理员审批：CN 先生成申请，管理员在 JP 签发接入包，CN 导入后继续。因此这是可恢复的两阶段安装，不是无需任何授权的自助入网。**包内不含任何密码、设备私钥、JP CA 私钥或 Gateway Key。**
 
@@ -72,10 +72,10 @@ fleet-kit/
 在新 CN 的普通管理员账户执行。优先使用以下固定版本下载，安装包与校验文件必须来自同一个 Release；不要混用 main 分支的未来手册与旧版本包。新 CN 必须能访问 GitHub 下载地址，网络失败时报告并由管理员提供已校验副本，不擅自改变 VPN/路由或索取 JP 登录凭据。
 
 ```bash
-mkdir -p ~/Downloads/cnagent-v3.0.1
-cd ~/Downloads/cnagent-v3.0.1
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+mkdir -p ~/Downloads/cnagent-v3.0.2
+cd ~/Downloads/cnagent-v3.0.2
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.0.2/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.0.2/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
 cd installer/fleet-kit
@@ -241,3 +241,11 @@ CN 不再有任何自动 SSH 登录 JP 的步骤，也不增加 JP 用户或 SSH
 交付时输出：设备 ID、版本、无秘密路径、各验收结果、Profile 使用方式、尚未授权的项目/未完成项、停止/回滚入口。不得输出认证信息或声称跳过的步骤完成。不需要做人数规划或并发评估，本手册专注于把当前整套环境装到这台新 CN。
 
 官方来源：[iTerm2](https://iterm2.com/downloads.html)、[Magpie 官方发布](https://github.com/yetone/magpie-releases/releases/tag/v0.1.3032)、[Claude 安装说明](https://code.claude.com/docs/en/setup)、[Python 3.14.10](https://www.python.org/downloads/release/python-31410/)。
+
+## v3.0.2 安装权限修复与验证范围
+
+v3.0.1 在严格 umask 下将受控运行目录创建为 root-only，并遗漏专用账户 `.local`、`.config` 父目录所有权，导致降权服务无法访问。v3.0.2 显式设置运行目录为 root-owned 0755、私有目录为 0700，并逐级设置专用账户目录为该账户所有的 0700；不递归修改既有数据。只对本安装器识别的同设备安装恢复，仍拒绝接管试点和同名未知账户。
+
+已完成本机权限修复后的 PF、端口账户隔离、私钥读取限制、受控网络负向测试和日本出口验收；真实 Claude 回复和工具调用仍失败，原因待定位，iTerm2 界面/退格键验收仍未完成。本版本不宣称整套环境已经通过验收。回归测试覆盖 umask 077、新建/恢复、父目录服务 UID 所有权及符号链接拒绝；不替代目标机实际验收。
+
+源码在 `fleet-kit/`；Git 仓库不包含大型软件和出口二进制，实际安装必须下载同版本完整 Release ZIP 并校验，不能直接运行不完整源码目录。旧 v3.0.1 附件保留供追溯，不覆盖。已安装设备请读取同版本手册后以原设备参数重跑安装入口恢复权限，并重新做全部验收；不要手动删除状态或重新生成身份。

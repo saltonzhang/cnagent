@@ -1,0 +1,21 @@
+{
+  "device_id": "cn-office-002",
+  "operator_user": "REPLACE_ME",
+  "operator_home": "/Users/REPLACE_ME",
+  "jp_host": "10.9.8.30",
+  "agent_user": "cnagent",
+  "network_user": "cnagentnet",
+  "agent_home": "/Users/cnagent",
+  "network_home": "/var/db/cn-agent-egress-net",
+  "install_base": "/Library/Application Support/CN-Agent-Egress",
+  "python_binary": "/usr/bin/python3",
+  "magpie_binary": "/Applications/magpie.app/Contents/MacOS/magpie",
+  "cn_api_port": 3435,
+  "api_adapter_port": 44337,
+  "web_proxy_port": 18190,
+  "jp_api_port": 43425,
+  "jp_egress_port": 43480,
+  "pf_anchor": "com.apple/cn-agent-pilot",
+  "jp_model_id": "codex/gpt-6.1-sol",
+  "enable_codex": false
+}

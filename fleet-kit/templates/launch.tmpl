@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+[ "$EUID" = 0 ] || { echo 'Run using sudo from an ordinary Terminal.' >&2; exit 1; }
+case "${1:-}" in claude|codex|shell) choice=$1;shift;; *) echo 'Usage: sudo launch claude|codex|shell [arguments]' >&2; exit 2;; esac
+base='@@INSTALL_BASE@@'
+# Refuse new sessions if the account boundary is not installed.
+/sbin/pfctl -s info 2>/dev/null | /usr/bin/grep -q 'Status: Enabled' || { echo 'PF protection unavailable' >&2;exit 1; }
+actual=$(/sbin/pfctl -a @@PF_ANCHOR@@ -sr 2>/dev/null)
+expected=$(/bin/cat "$base/private/expected-pf.txt")
+[ "$actual" = "$expected" ] || { echo 'Pilot identity rules changed' >&2; exit 1; }
+cd @@AGENT_HOME@@/workspace
+# Preserve terminal capability metadata, never arbitrary shell/proxy environment.
+terminal_type=${TERM:-xterm-256color}
+case "$terminal_type" in xterm*|screen*|tmux*|vt100|ansi) ;; *) terminal_type=xterm-256color;; esac
+terminal_program=${TERM_PROGRAM:-}
+case "$terminal_program" in iTerm.app|Apple_Terminal) ;; *) terminal_program=;; esac
+terminal_locale=${LANG:-en_US.UTF-8}
+case "$terminal_locale" in en_US.UTF-8|zh_CN.UTF-8|zh_TW.UTF-8|ja_JP.UTF-8|C.UTF-8) ;; *) terminal_locale=en_US.UTF-8;; esac
+terminal_color=${COLORTERM:-}
+case "$terminal_color" in truecolor|24bit) ;; *) terminal_color=;; esac
+if [ -t 0 ]; then /bin/stty erase '^?' iutf8; fi
+case "$choice" in shell) command=/bin/zsh;; *) command="@@AGENT_HOME@@/.local/bin/$choice";; esac
+exec /usr/bin/sudo -u @@AGENT_USER@@ /usr/bin/env -i HOME=@@AGENT_HOME@@ USER=@@AGENT_USER@@ LOGNAME=@@AGENT_USER@@ \
+ PATH=@@AGENT_HOME@@/.local/bin:@@PYTHON_BIN_DIR@@:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin \
+ TERM="$terminal_type" TERM_PROGRAM="$terminal_program" COLORTERM="$terminal_color" LANG="$terminal_locale" LC_CTYPE="$terminal_locale" \
+ HTTP_PROXY=http://127.0.0.1:@@WEB_PROXY_PORT@@ HTTPS_PROXY=http://127.0.0.1:@@WEB_PROXY_PORT@@ \
+ http_proxy=http://127.0.0.1:@@WEB_PROXY_PORT@@ https_proxy=http://127.0.0.1:@@WEB_PROXY_PORT@@ \
+ NO_PROXY=localhost,127.0.0.1,::1 no_proxy=localhost,127.0.0.1,::1 \
+ /usr/bin/sandbox-exec -f "$base/controlled.sb" "$command" "$@"

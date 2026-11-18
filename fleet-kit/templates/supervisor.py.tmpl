@@ -1,0 +1,43 @@
+#!@@PYTHON_BINARY@@
+"""Root service manager; children lose root before exec. Contains no credentials."""
+import os,pwd,pathlib,subprocess,signal,time,re,sys
+b=pathlib.Path('@@INSTALL_BASE@@');private=b/'private';u=pwd.getpwnam('@@AGENT_USER@@');h=u.pw_dir
+stop=False;children=[];token=None
+def finish(*args):
+ global stop;stop=True
+signal.signal(signal.SIGTERM,finish);signal.signal(signal.SIGINT,finish)
+def command(args):return subprocess.run(args,capture_output=True,text=True,check=True).stdout
+assert os.getuid()==0
+rules=command(['/sbin/pfctl','-sr']);assert 'anchor "com.apple/*"' in rules
+subprocess.run(['/sbin/pfctl','-a','@@PF_ANCHOR@@','-nf',str(b/'pilot.pf')],check=True,capture_output=True)
+subprocess.run(['/sbin/pfctl','-a','@@PF_ANCHOR@@','-f',str(b/'pilot.pf')],check=True,capture_output=True)
+expected=command(['/sbin/pfctl','-a','@@PF_ANCHOR@@','-sr']);(private/'expected-pf.txt').write_text(expected)
+r=subprocess.run(['/sbin/pfctl','-E'],capture_output=True,text=True,check=True);m=re.search(r'Token\s*:\s*(\d+)',r.stdout+r.stderr);assert m;token=m.group(1)
+def identity(user):
+ def demote():os.initgroups(user.pw_name,user.pw_gid);os.setgid(user.pw_gid);os.setuid(user.pw_uid)
+ return demote
+env={'HOME':h,'USER':'@@AGENT_USER@@','LOGNAME':'@@AGENT_USER@@','PATH':h+'/.local/bin:@@PYTHON_BIN_DIR@@:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin','MAGPIE_ADDR':'127.0.0.1:@@CN_API_PORT@@'}
+def launch(name,args,user):
+ path=private/(name+'-service.log');fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_APPEND|os.O_NOFOLLOW,0o600)
+ try:q=subprocess.Popen(['/usr/bin/sandbox-exec','-f',str(b/'controlled.sb')]+args,preexec_fn=identity(user),env=env,cwd=user.pw_dir,stdin=subprocess.DEVNULL,stdout=fd,stderr=fd,start_new_session=True)
+ finally:os.close(fd)
+ children.append(q);(private/(name+'.pid')).write_text(str(q.pid))
+try:
+ netuser=pwd.getpwnam('@@NETWORK_USER@@')
+ for name,port,remote in [('api',@@API_ADAPTER_PORT@@,@@JP_API_PORT@@),('egress',@@WEB_PROXY_PORT@@,@@JP_EGRESS_PORT@@)]:
+  launch(name,[str(b/'wg-transport'),'-role','client','-listen','127.0.0.1:'+str(port),'-remote','@@JP_HOST@@:'+str(remote),'-cert','@@NETWORK_HOME@@/client.pem','-key','@@NETWORK_HOME@@/client-key.pem','-ca','@@NETWORK_HOME@@/ca.pem'],netuser)
+ launch('magpie',['@@MAGPIE_BINARY@@','serve'],u)
+ while not stop:
+  time.sleep(1)
+  if any(p.poll() is not None for p in children):raise RuntimeError('controlled_service_stopped')
+  if 'Status: Enabled' not in command(['/sbin/pfctl','-s','info']):raise RuntimeError('filter_disabled')
+  if command(['/sbin/pfctl','-a','@@PF_ANCHOR@@','-sr'])!=expected:raise RuntimeError('filter_changed')
+except Exception:
+ print('Controlled services stopped: protection or child unavailable.',flush=True)
+finally:
+ for p in children:
+  if p.poll() is None:p.terminate()
+ for p in children:
+  try:p.wait(5)
+  except subprocess.TimeoutExpired:p.kill()
+ if token:subprocess.run(['/sbin/pfctl','-X',token],capture_output=True)
