@@ -1,12 +1,12 @@
 # CN MAC 安装部署手册：交给 AI 执行
 
-版本 3.0 · 2026-11-18。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
+手册/发行版 3.0.1（仅文档修订，运行时基线 3.0）· 2026-11-18。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
 
 ## 直接交给另一台电脑的 AI
 
-把本 MD 和 ZIP 复制到一台新 CN MAC。发送下面这段即可，不必逐条给它敲安装命令：
+新 CN 不必先手动复制安装包。把下面这段指令发给有本机终端权限的 AI，它应先从 GitHub 读取本手册，再下载同版 Release。已复制文件的离线方式仍可使用。
 
-> 根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；拿到签名接入包后继续安装。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
+> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.0.1 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；拿到签名接入包后继续安装。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
 
 执行 AI 需要有这台 CN MAC 的终端执行权限；只有聊天能力不能安装。软件已随包携带，不要求新电脑预先安装 Homebrew、Node 或 Python。CN 只需要本机管理员授权；JP 的管理认证仅发生在管理员自己的电脑或 JP 本机，不能在新 CN 上进行。设备授权仍需要管理员审批：CN 先生成申请，管理员在 JP 签发接入包，CN 导入后继续。因此这是可恢复的两阶段安装，不是无需任何授权的自助入网。**包内不含任何密码、设备私钥、JP CA 私钥或 Gateway Key。**
 
@@ -69,7 +69,24 @@ fleet-kit/
 
 ## 4. 实际安装入口
 
-用普通管理员账户解压，保留 MD、`fleet-kit/` 同级。先检查 ZIP 外部摘要（若同时收到 `.sha256`），再检查包内清单：
+在新 CN 的普通管理员账户执行。优先使用以下固定版本下载，安装包与校验文件必须来自同一个 Release；不要混用 main 分支的未来手册与旧版本包。新 CN 必须能访问 GitHub 下载地址，网络失败时报告并由管理员提供已校验副本，不擅自改变 VPN/路由或索取 JP 登录凭据。
+
+```bash
+mkdir -p ~/Downloads/cnagent-v3.0.1
+cd ~/Downloads/cnagent-v3.0.1
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.0.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
+cd installer/fleet-kit
+shasum -a 256 -c MANIFEST.sha256
+bash install.sh --plan
+bash install.sh
+```
+
+逐步执行，每步必须成功才继续；校验失败禁止解压执行。若 `installer` 目录已存在，先确认其归属，不覆盖用户已有目录或重复解压混合版本。读取包内同版手册，与 Release 附件手册应一致。GitHub 校验文件用于检查损坏，仓库来源和授权仍需可信。
+
+也可由管理员复制同版 ZIP、校验文件和手册到新 CN；离线安装的软件内容齐全，但实际接入/验收仍需要办公室内网和 JP 服务。解压后保留 MD、`fleet-kit/` 同级，再检查包内清单并执行：
 
 ```bash
 cd /实际解压目录/fleet-kit
