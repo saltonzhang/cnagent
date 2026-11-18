@@ -1,0 +1,81 @@
+# JP MAC 管理员：签发 CN 设备接入包
+
+版本 3.0 · 2026-11-18。此流程仅由管理员在 JP 本机运行，或从管理员自己的可信管理电脑操作 JP；不让新 CN SSH 登录 JP，不向 CN 分发 JP 登录账号、密码或 SSH Key。
+
+## 给 JP 管理 AI 的指令
+
+> 按本手册处理指定 CN 的登记申请，只使用当前 JP 已有 CA、固定核心和 mTLS 服务，确认申请来源及设备 ID 后签发接入包。不要重建 CA、替换网关、重启服务或更改其他设备。不要输出 Key/私钥/接入包正文。返回接入包文件路径和无秘密状态，使用受控文件渠道交付。
+
+复制并解压 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip` 到 JP 的管理员私有目录；无需安装 CN 的软件和守护程序。使用 JP 现有 Python 3（3.8+），先读取适用的 AGENTS.md。检查管理员包清单及受信任来源，不执行 CN 提供的程序，只读取 `.request.json` 数据文件。
+
+## 1. 检查申请，不做任何登记
+
+```bash
+cd /实际解压目录/jp-admin-kit
+/usr/bin/shasum -a 256 -c MANIFEST.sha256
+python3 admin/issue_access.py \
+  --request /绝对路径/设备.request.json \
+  --out /管理员私有目录/设备.access.json
+```
+
+没有 `--approve` 时只显示设备 ID、CSR 摘要和路由，不签证书、不创建 Key。通过可信管理渠道确认设备归属及摘要，不能把“文件里写着这个 ID”当成身份证明。
+
+签发器检查当前管理员 Home 下的：
+
+- `ai/cn-agent-egress-pilot/wg-private/`：已有 CA/允许序列号。
+- `Library/LaunchAgents/local.cn-agent-wireguard.api.plist` 与 `.egress.plist`：已有端口/允许列表路径。
+- `ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json`：固定核心、SHA 和 configDir。
+
+CA 必须与安装包内固定公共 CA 一致，核心 SHA 必须正确；路径/证书变更会拒绝，不能初始化一个新 CA 或清空记录“修复”。
+
+## 2. 默认：接入包自动带 Key，CN 无需手填
+
+确认后运行：
+
+```bash
+python3 admin/issue_access.py \
+  --request /绝对路径/设备.request.json \
+  --out /管理员私有目录/设备.access.json \
+  --approve
+```
+
+这会增量登记本设备、签发其客户端证书并创建/复用独立 Magpie Gateway Key。接入包绑定申请/CSR/随机数/路由，默认 48 小时内导入。可用 `--valid-hours 1..168` 显式设置有效期。客户端证书默认 90 天，接入包导入时效不是证书或 Key 的有效期。
+
+包由独立 CA:false、codeSigning 身份签名。首次签发会在 JP 私有 CA 目录生成专用签名密钥与证书，不注册为可访问模型/代理的客户端，不重启任何 JP 服务。它们仅用于签名接入包，私钥不能复制到 CN。管理员包只包含公开 CA 和程序，不含任何现成私钥/Key。
+
+把 `.access.json` 通过管理员认可的安全文件渠道交给对应 CN。**文件含该设备 Gateway Key，签名不等于加密，Base64 不是加密；不得贴到 AI 聊天或公共共享位置。** CN 导入命令：
+
+```bash
+bash install.sh --access-bundle /绝对路径/设备.access.json
+```
+
+CN 自动配置 Key 并验收；全过程不接触 JP 登录凭据。程序 stdout 只显示路径、状态和是否包含 Key，不显示秘密。CSR 和 CA 公共证书不是登录凭据；客户端私钥只在 CN 现场生成，接入包不能替代该私钥，不能拿给另一台电脑使用。
+
+## 3. 可选：用户在 CN 私密输入 Key
+
+如果不希望 Key 在接入包里携带：
+
+```bash
+python3 admin/issue_access.py \
+  --request /绝对路径/设备.request.json \
+  --out /管理员私有目录/设备.access.json \
+  --approve --omit-api-key
+```
+
+此包仍包含必需的设备证书和签名，但不含 Key。管理员通过受控密码管理器/私密通道交付本设备 Key。JP 的 root/管理员私有记录 `wg-private/fleet-delivery/<device_id>.json` 保存对应 Key 和 ID；不要让 AI `cat` 到终端/聊天。需要查看/交付时只在管理员自己的安全界面或程序内处理，不显示其他设备信息。
+
+CN 导入时先验证签名、设备绑定和时效，再提示隐藏输入 Key。没有安全交互终端时必须暂停，不能改成聊天提问、命令行参数、环境变量或写入公共配置。即使手动填 Key，也不能省略设备证书或放开门禁。
+
+## 4. 幂等、错误和维护
+
+- 相同设备、同 CSR、同申请的已有有效输出可复用，不重复创建 Key。
+- 申请默认 7 天内处理；超期回 CN 重新运行安装器生成新随机数。过期接入包需管理员生成新的输出文件，不能在 CN 修改时间。
+- 不同 CSR、撤销身份、同名但无交付记录的 Key、损坏登记记录：明确拒绝，管理员调查，不能删其他设备/Key 或复制试点私钥。
+- 签名身份约 90 天；接近到期或不完整时会停止签发，需管理员准备签名身份轮换。当前无自动续签承诺；此身份轮换与模型运行时无关，不需要替换 CA 或重启网关。
+- CA/签名私钥与交付记录仅管理员可读；含 Key 输出文件 0600。默认不覆盖已有不同/过期/错误模式输出，换新文件名重签，保留审计依据。
+- 撤销本设备时，在 JP 执行 `issue_client.py revoke --ca-dir <核实目录> --device-id <设备ID>`，再用固定核心删除交付记录里的准确 `gateway_key_id`。不删除整个 Key 列表。已建立的长连接可能需另行协调断开。
+- 这不是自助注册 API；不会开放远程管理端口。仅凭 Generic 安装包或陌生 CSR 不能自动获得 JP 使用权限。
+
+## 验证边界
+
+新版签名/导入流程以临时 CA、真实 CSR/客户端证书和签名验签完成隔离测试；Gateway Key CLI 在隔离环境模拟。没有在生产 JP 签发测试身份或重启服务，也没有在第二台空白 CN 执行完整安装。最终以新 CN 实际 mTLS、Claude 工具、日本出口和普通账户拒绝验收为准，不能用单元测试冒充生产验证。
