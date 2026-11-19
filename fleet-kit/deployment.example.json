@@ -16,6 +16,6 @@
   "jp_api_port": 43425,
   "jp_egress_port": 43480,
   "pf_anchor": "com.apple/cn-agent-pilot",
-  "jp_model_id": "codex/gpt-6.1-sol",
+  "jp_model_id": "group/cn-default",
   "enable_codex": false
 }
