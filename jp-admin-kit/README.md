@@ -1,1 +1,1 @@
-JP administrator only. Read JP-MAC-DEVICE-ENROLLMENT.md. Run locally on JP; this archive contains no login credentials, CA private keys, client private keys, or Gateway Keys. CN uses the separate installer and never logs into JP.
+JP administrator kit v3.1.0. Read JP-MAC-DEVICE-ENROLLMENT.md. Central entry group/cn-default initially maps to Claude Opus 5.5. No private keys or login credentials included.

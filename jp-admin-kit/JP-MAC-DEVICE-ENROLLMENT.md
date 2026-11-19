@@ -1,12 +1,18 @@
 # JP MAC 管理员：签发 CN 设备接入包
 
-版本 3.0 · 2026-11-18。此流程仅由管理员在 JP 本机运行，或从管理员自己的可信管理电脑操作 JP；不让新 CN SSH 登录 JP，不向 CN 分发 JP 登录账号、密码或 SSH Key。
+版本 3.1.0 · 2026-11-18。此流程仅由管理员在 JP 本机运行，或从管理员自己的可信管理电脑操作 JP；不让新 CN SSH 登录 JP，不向 CN 分发 JP 登录账号、密码或 SSH Key。
 
 ## 给 JP 管理 AI 的指令
 
 > 按本手册处理指定 CN 的登记申请，只使用当前 JP 已有 CA、固定核心和 mTLS 服务，确认申请来源及设备 ID 后签发接入包。不要重建 CA、替换网关、重启服务或更改其他设备。不要输出 Key/私钥/接入包正文。返回接入包文件路径和无秘密状态，使用受控文件渠道交付。
 
 复制并解压 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip` 到 JP 的管理员私有目录；无需安装 CN 的软件和守护程序。使用 JP 现有 Python 3（3.8+），先读取适用的 AGENTS.md。检查管理员包清单及受信任来源，不执行 CN 提供的程序，只读取 `.request.json` 数据文件。
+
+## JP 统一模型入口
+
+新 CN 默认申请 `group/cn-default`，JP 该组当前指向 `claude/claude-opus-5-5`。在批准新申请前运行 `python3 admin/central_model.py` 确认组存在。需要切换时先运行 `python3 admin/central_model.py --model <实际模型ID>` 预览，再加 `--apply` 修改；程序备份完整 providers.json，仅改此组，不重启 JP。所有使用该入口的 CN 在后续请求使用新目标，无需改 CN 的实际模型名。
+
+旧申请仍绑定旧模型，不应篡改申请或已签名接入包；已有 v3 CN 可按 CN 手册运行一次本地迁移工具。管理员 Key 若有模型限制，需要明确允许 `group/cn-default`，不能通过扩大到所有模型绕过授权；新签发工具保留当前 Key 策略。
 
 ## 1. 检查申请，不做任何登记
 

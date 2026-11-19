@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-18",
-  "kitVersion": "3.0",
+  "date": "2026-11-19",
+  "kitVersion": "3.1.0",
   "purpose": "Offline administrator-approved enrollment; new CN never logs into JP",
   "pythonHelperTests": {
     "count": 9,
@@ -118,5 +118,20 @@
       "private-key mismatch preserves active certificate",
       "no JP SSH invocation or login flag in CN installer"
     ]
+  },
+  "centralModel": {
+    "entry": "group/cn-default",
+    "defaultTarget": "claude/claude-opus-5-5",
+    "JPRealResponsesStreamPassed": true,
+    "JPRealToolContinuationPassed": true,
+    "isolatedStrictTranslationToRealClaudePassed": true,
+    "isolatedChineseTool422": true,
+    "isolatedDisabledPlugin503": true,
+    "productionMasterSwitchPreserved": true,
+    "productionMasterSwitchValue": false,
+    "existingCNRemotelyMigrated": false,
+    "migrationTests": 2,
+    "newCNRealInstallationStillRequired": true,
+    "totalPythonTestsPassed": 43
   }
 }
