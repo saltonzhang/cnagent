@@ -47,7 +47,7 @@ def render(raw,out):
   p=out/f.name[:-5];p.write_text(s);p.chmod(0o700 if p.name in ['launch','supervisor.py'] else 0o600)
  # The gateway secret is intentionally NOT rendered. Read its protected file
  # only when installing the dedicated providers.json on the target machine.
- provider={'providers':[{'id':'remote-magpie','name':'jp','preset':'remote-magpie','key':'__READ_FROM_PROTECTED_DEVICE_KEY_FILE__','chat':'http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1','proxy':'direct','models':[c['jp_model_id']]}]}
+ provider={'providers':[{'id':'remote-magpie','name':'jp','key':'__READ_FROM_PROTECTED_DEVICE_KEY_FILE__','responses':'http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1','proxy':'direct','models':[c['jp_model_id']]}]}
  (out/'providers.template.json').write_text(json.dumps(provider,indent=2));(out/'settings.json').write_text(json.dumps({'lan':False,'proxy':'direct'}))
  (out/'claude-settings.json').write_text(json.dumps({'env':{'ANTHROPIC_BASE_URL':'http://127.0.0.1:'+str(c['cn_api_port']),'ANTHROPIC_AUTH_TOKEN':'cnagent-local'},'model':'remote-magpie/'+c['jp_model_id']},indent=2))
  label='local.cn-agent-wireguard.controlled'

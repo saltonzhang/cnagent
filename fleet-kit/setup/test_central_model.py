@@ -7,7 +7,7 @@ class CentralModelTests(unittest.TestCase):
   c=dict(render.DEFAULT,operator_user='operator',operator_home='/Users/operator')
   with tempfile.TemporaryDirectory() as td:
    p=pathlib.Path(td)/'render';render.render(c,p);provider=json.loads((p/'providers.template.json').read_text())['providers'][0];claude=json.loads((p/'claude-settings.json').read_text())
-   self.assertEqual(provider['models'],['group/cn-default']);self.assertEqual(claude['model'],'remote-magpie/group/cn-default')
+   self.assertNotIn('preset',provider);self.assertNotIn('chat',provider);self.assertEqual(provider['responses'],'http://127.0.0.1:44337/v1');self.assertEqual(provider['models'],['group/cn-default']);self.assertEqual(claude['model'],'remote-magpie/group/cn-default')
  def test_migration_preserves_key_other_settings_and_rolls_back_exactly(self):
   with tempfile.TemporaryDirectory() as td:
    b=pathlib.Path(td);h=b/'agent';(h/'.config/magpie').mkdir(parents=True);(h/'.claude').mkdir();(b/'private').mkdir();config=b/'private/config.json'

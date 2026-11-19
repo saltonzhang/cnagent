@@ -12,5 +12,15 @@
   "Python_tests_passed": 46,
   "existing_CNs_migrated_remotely": false,
   "fresh_CN_installation_verified": false,
-  "v3_0_2_directory_permission_fix_preserved": true
+  "v3_0_2_directory_permission_fix_preserved": true,
+  "CN162_live_trial": {
+    "modelOK": true,
+    "actualBashToolAndResultDONE": true,
+    "proxyCountry": "JP",
+    "allNetworkDenialsPassed": true,
+    "servicesRestarted": false,
+    "GUIOpened": false,
+    "provider": "custom Responses only",
+    "backup": "root-only on CN"
+  }
 }

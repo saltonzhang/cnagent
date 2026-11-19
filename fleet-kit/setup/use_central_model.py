@@ -26,11 +26,11 @@ def main():
  claude=json.loads(paths[1].read_text());request=enrollment.read(paths[3]);enrollment.validate_request(request,ROOT/'trust/jp-ca.pem')
  print(json.dumps({'before':c['jp_model_id'],'after':MODEL,'apply':a.apply,'restartRequired':False}))
  if not a.apply:return
- if c['jp_model_id']==MODEL and claude.get('model')=='remote-magpie/'+MODEL and MODEL in matches[0].get('models',[]):return
+ if c['jp_model_id']==MODEL and claude.get('model')=='remote-magpie/'+MODEL and MODEL in matches[0].get('models',[]) and not matches[0].get('preset') and matches[0].get('responses')=='http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1':return
  backup=base/'private/central-model-backups'/datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');backup.mkdir(parents=True,mode=0o700)
  for i,path in enumerate(paths):write(backup/(str(i)+'.before'),path.read_bytes())
  write(backup/'paths.json',json.dumps([str(x) for x in paths]))
- matches[0]['models']=list(dict.fromkeys(matches[0].get('models',[])+[MODEL]));claude['model']='remote-magpie/'+MODEL;c['jp_model_id']=MODEL
+ matches[0].pop('preset',None);matches[0].pop('chat',None);matches[0].pop('anthropic',None);matches[0]['responses']='http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1';matches[0]['models']=list(dict.fromkeys(matches[0].get('models',[])+[MODEL]));claude['model']='remote-magpie/'+MODEL;c['jp_model_id']=MODEL
  request=enrollment.request_for(c,request['csr'],secrets.token_hex(32),int(__import__('time').time()),ROOT/'trust/jp-ca.pem')
  write(paths[0],json.dumps(providers,indent=2),uid=agent.pw_uid,gid=agent.pw_gid);write(paths[1],json.dumps(claude,indent=2),uid=agent.pw_uid,gid=agent.pw_gid);write(config,json.dumps(c,indent=2));write(paths[3],enrollment.canonical(request))
  print(json.dumps({'migrated':True,'backup':str(backup),'keysAndCertificatesUnchanged':True,'newClaudeSessionRequired':True,'oldAccessBundleMustNotBeReimported':True}))

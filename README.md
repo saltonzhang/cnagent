@@ -1,27 +1,27 @@
-# CN Agent — 新 CN MAC 完整安装包 v3.1.0
+# CN Agent — 新 CN MAC 完整安装包 v3.1.1
 
 在新 CN MAC 安装受控 Claude、Magpie、日本出口及依赖。新 CN 不需要 JP 的 SSH 账号、密码或登录密钥。
 
 ## 新 CN 下载
 
-- **[完整安装包（约 338 MB，Apple Silicon + Intel）](https://github.com/saltonzhang/cnagent/releases/download/v3.1.0/CN-MAC-AI-DEPLOYMENT-KIT.zip)**
-- [SHA-256 校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.1.0/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
+- **[完整安装包（约 338 MB，Apple Silicon + Intel）](https://github.com/saltonzhang/cnagent/releases/download/v3.1.1/CN-MAC-AI-DEPLOYMENT-KIT.zip)**
+- [SHA-256 校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.1.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
 - **[给安装 AI 阅读的手册](CN-MAC-AI-DEPLOYMENT.md)**
-- [版本下载页](https://github.com/saltonzhang/cnagent/releases/tag/v3.1.0)
+- [版本下载页](https://github.com/saltonzhang/cnagent/releases/tag/v3.1.1)
 
 包内含 iTerm2、Claude 原生程序、独立 Magpie、Python 和出口程序，无需预装 Node/Homebrew。固定兼容版本与适用范围见手册。Codex 工具及受控 VS Code 未完成适配，不宣称支持。
 
 将下面的指令交给新 CN 的 AI：
 
-> 根据仓库 CN-MAC-AI-DEPLOYMENT.md，下载 v3.1.0 完整 CN 安装包并核对校验值，安装所有依赖并生成设备申请。不要 SSH 登录 JP 或索取 JP 登录信息。等待管理员提供签名接入包后，导入并继续安装，完成实际链路和界面验收；不能把等待授权算作安装成功。密码和 Key 不要输出到聊天。
+> 根据仓库 CN-MAC-AI-DEPLOYMENT.md，下载 v3.1.1 完整 CN 安装包并核对校验值，安装所有依赖并生成设备申请。不要 SSH 登录 JP 或索取 JP 登录信息。等待管理员提供签名接入包后，导入并继续安装，完成实际链路和界面验收；不能把等待授权算作安装成功。密码和 Key 不要输出到聊天。
 
 也可在新 CN 的普通管理员终端下载：
 
 ```bash
 mkdir -p ~/Downloads/cnagent-v3
 cd ~/Downloads/cnagent-v3
-curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.1.0/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
-curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.1.0/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.1.1/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL https://github.com/saltonzhang/cnagent/releases/download/v3.1.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
 cd installer/fleet-kit
@@ -92,8 +92,14 @@ v3.0.1 在严格 umask 下将受控运行目录创建为 root-only，并遗漏�
 
 已完成本机权限修复后的 PF、端口账户隔离、私钥读取限制、受控网络负向测试和日本出口验收；真实 Claude 回复和工具调用仍失败，原因待定位，iTerm2 界面/退格键验收仍未完成。本版本不宣称整套环境已经通过验收。回归测试覆盖 umask 077、新建/恢复、父目录服务 UID 所有权及符号链接拒绝；不替代目标机实际验收。
 
-源码在 `fleet-kit/`；Git 仓库不包含大型软件和出口二进制，实际安装必须下载同版本完整 Release ZIP 并校验，不能直接运行不完整源码目录。旧 v3.1.0 附件保留供追溯，不覆盖。已安装设备请读取同版本手册后以原设备参数重跑安装入口恢复权限，并重新做全部验收；不要手动删除状态或重新生成身份。
+源码在 `fleet-kit/`；Git 仓库不包含大型软件和出口二进制，实际安装必须下载同版本完整 Release ZIP 并校验，不能直接运行不完整源码目录。旧 v3.1.1 附件保留供追溯，不覆盖。已安装设备请读取同版本手册后以原设备参数重跑安装入口恢复权限，并重新做全部验收；不要手动删除状态或重新生成身份。
 
 ## JP 统一模型管理
 
 新 CN 默认使用 `group/cn-default`，JP 当前指向 Claude Opus 5.5。以后只在 JP 调整路由组。已安装 v3 CN 可按手册预览并运行 `setup/use_central_model.py --apply` 一次；历史无安装记录的试点需单独迁移。JP 当前总开关关闭，本次没有改变翻译/门禁开关。
+
+## v3.1.1: Responses-only provider correction
+
+Keep provider ID remote-magpie but REMOVE preset remote-magpie and the chat/anthropic endpoints. Use only responses=http://127.0.0.1:44337/v1 (or configured adapter port). The Remote Magpie preset fills Messages endpoints and causes 422 translation_path_unsupported at the strict JP gateway. CN must convert Messages into Responses locally. The migration tool now applies this correction even when the group is already selected. No JP gate is relaxed.
+
+Live legacy pilot 192.168.1.162 passed real Claude OK, actual Bash tool/result DONE, JP public egress and direct/proxy/IPv6/UDP/DNS IPC denials on 2026-11-19. No service restarted, certificate/key/PF unchanged. This is not a fresh installation test. GUI was not opened; the ordinary desktop Magpie uses another account/config. No legacy v3 state was fabricated.

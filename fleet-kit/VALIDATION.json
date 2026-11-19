@@ -1,6 +1,6 @@
 {
   "date": "2026-11-19",
-  "kitVersion": "3.1.0",
+  "kitVersion": "3.1.1",
   "purpose": "Offline administrator-approved enrollment; new CN never logs into JP",
   "pythonHelperTests": {
     "count": 9,
@@ -275,5 +275,15 @@
       "installationComplete": false,
       "newReleaseFullSystemRetest": false
     }
+  },
+  "CN162LiveTrial": {
+    "realClaudeReplyOK": true,
+    "realBashToolAndResultPassed": true,
+    "proxyCountry": "JP",
+    "negativeNetworkProbesPassed": true,
+    "responsesOnlyProviderRequired": true,
+    "productionServicesRestarted": false,
+    "GUIOpened": false,
+    "legacyPilotNoV3StateAdopted": true
   }
 }
