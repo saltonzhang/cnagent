@@ -1,6 +1,6 @@
-import importlib.util,json,os,pathlib,plistlib,subprocess,tempfile,unittest
+import importlib.util,json,os,pathlib,plistlib,subprocess,tempfile,unittest,sys
 from unittest import mock
-ROOT=pathlib.Path(__file__).resolve().parents[1]
+ROOT=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'admin'))
 def module(name,path):
  s=importlib.util.spec_from_file_location(name,str(path));m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
 ri=module('root_install',ROOT/'setup/root_install.py');jp=module('jp_enroll',ROOT/'admin/jp_enroll.py')
@@ -90,11 +90,11 @@ class InstallerTests(unittest.TestCase):
     (jobs/('local.cn-agent-wireguard.'+r+'.plist')).write_bytes(plistlib.dumps({'ProgramArguments':['test','-allowed',str(ca/'allowed-serial'),'-listen','10.9.8.30:'+str(p)]}))
    request={'device_id':'cn-test','csr':(h/'client.csr').read_text()};source=(ROOT/'issue_client.py').read_text()
    with mock.patch.object(pathlib.Path,'home',return_value=h):
-    one=jp.enroll(request,source);two=jp.enroll(request,source)
+    one=jp.enroll(request,source,budget_policy={'mode':'unlimited'});two=jp.enroll(request,source,budget_policy={'mode':'unlimited'})
    self.assertEqual(one,two);self.assertNotIn('client-key.pem',one);self.assertIn('abcdef',(ca/'allowed-serial').read_text());self.assertEqual(len(json.loads((config/'caller-keys.json').read_text())),1)
    self.assertEqual((ca/'fleet-delivery/cn-test.json').stat().st_mode&0o777,0o600)
  def test_jp_changed_pin_stops_before_enrollment(self):
   with tempfile.TemporaryDirectory() as td:
    h=pathlib.Path(td);f=h/'binary';f.write_text('changed');d=h/'ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json';d.parent.mkdir(parents=True);d.write_text(json.dumps({'binary':str(f),'binarySHA256':'0'*64,'configDir':str(h)}))
-   with mock.patch.object(pathlib.Path,'home',return_value=h),self.assertRaisesRegex(ValueError,'pin_changed'):jp.enroll({},'')
+   with mock.patch.object(pathlib.Path,'home',return_value=h),self.assertRaisesRegex(ValueError,'pin_changed'):jp.enroll({},'',budget_policy={'mode':'unlimited'})
 if __name__=='__main__':unittest.main()

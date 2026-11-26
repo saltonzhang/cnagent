@@ -49,25 +49,29 @@ class OfflineEnrollmentTests(unittest.TestCase):
    for name in ['ca.pem','ca-key.pem']:shutil.copy2(self.ca/name,ca/name)
    (ca/'allowed-serial').write_text('abcdef\n')
    config=h/'.config/magpie';config.mkdir(parents=True);(config/'caller-keys.json').write_text('[]')
-   native=h/'native';native.write_text('#!/usr/bin/env python3\nimport json,os,pathlib\np=pathlib.Path(os.environ["XDG_CONFIG_HOME"])/"magpie/caller-keys.json"\np.write_text(json.dumps([{"id":"new-id","name":"cn-cn-test","secret":"public-test-gateway-key-not-real"}]))\nprint("public-test-gateway-key-not-real")\n');native.chmod(0o755)
+   native=h/'native';native.write_text('#!/usr/bin/env python3\nimport json,os,pathlib,sys\np=pathlib.Path(os.environ["XDG_CONFIG_HOME"])/"magpie/caller-keys.json"\nkeys=json.loads(p.read_text())\nif sys.argv[2]=="add":\n keys.append({"id":"new-id","name":"cn-cn-test","secret":"public-test-gateway-key-not-real"});p.write_text(json.dumps(keys));print("public-test-gateway-key-not-real")\nelif sys.argv[2]=="limit":\n if os.environ.get("TEST_QUOTA_FAULT"):sys.exit(2)\n limit={"period":sys.argv[4]}\n if "--tokens" in sys.argv:limit["tokens"]=int(sys.argv[sys.argv.index("--tokens")+1])\n if "--cost" in sys.argv:limit["cost"]=float(sys.argv[sys.argv.index("--cost")+1])\n if "--cache-reads" in sys.argv:limit["cacheReads"]=True\n next(x for x in keys if x["id"]==sys.argv[3])["limit"]=limit;p.write_text(json.dumps(keys))\nelse:sys.exit(3)\n');native.chmod(0o755)
    d=h/'ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json';d.parent.mkdir(parents=True);d.write_text(json.dumps({'binary':str(native),'binarySHA256':enrollment.sha(native.read_bytes()),'configDir':str(config)}))
    jobs=h/'Library/LaunchAgents';jobs.mkdir(parents=True)
    for role,port in [('api',43425),('egress',43480)]:
     (jobs/('local.cn-agent-wireguard.'+role+'.plist')).write_bytes(plistlib.dumps({'ProgramArguments':['test',str(ca/'allowed-serial'),'10.9.8.30:'+str(port)]}))
    output=h/'device.access.json';captured=io.StringIO()
    with mock.patch.object(issue_access,'ROOT',kit),mock.patch.object(pathlib.Path,'home',return_value=h),contextlib.redirect_stdout(captured):
-    first=issue_access.issue(self.request,output);second=issue_access.issue(self.request,output)
-    omitted=h/'manual.access.json';manual=issue_access.issue(self.request,omitted,omit_key=True)
+    chosen=issue_access.device_budget.policy('day',1000000,cache_reads=True)
+    with mock.patch.dict('os.environ',{'TEST_QUOTA_FAULT':'1'}),self.assertRaisesRegex(ValueError,'budget_update_failed'):
+     issue_access.issue(self.request,output,budget_policy=chosen)
+    self.assertFalse(output.exists())
+    first=issue_access.issue(self.request,output,budget_policy=chosen);second=issue_access.issue(self.request,output,budget_policy=chosen)
+    omitted=h/'manual.access.json';manual=issue_access.issue(self.request,omitted,omit_key=True,budget_policy=chosen)
    self.assertNotIn(self.delivery['gateway_key'],captured.getvalue());self.assertFalse(first['reused']);self.assertTrue(second['reused']);self.assertFalse(manual['api_key_included'])
    self.assertEqual(output.stat().st_mode&0o777,0o600);self.assertEqual((ca/'bundle-signing-key.pem').stat().st_mode&0o777,0o600)
    verified=enrollment.verify_bundle(enrollment.read(output),self.request,kit/'trust/jp-ca.pem');self.assertEqual(verified['gateway_key'],self.delivery['gateway_key'])
    self.assertNotIn('gateway_key',enrollment.verify_bundle(enrollment.read(omitted),self.request,kit/'trust/jp-ca.pem'))
    self.assertIn('abcdef',(ca/'allowed-serial').read_text());self.assertEqual(len(json.loads((config/'caller-keys.json').read_text())),1)
    state=json.loads((ca/'fleet-registry.json').read_text());state['devices']['cn-test']['status']='revoked';(ca/'fleet-registry.json').write_text(json.dumps(state))
-   with mock.patch.object(issue_access,'ROOT',kit),mock.patch.object(pathlib.Path,'home',return_value=h),self.assertRaisesRegex(ValueError,'no_longer_active'):issue_access.issue(self.request,output)
+   with mock.patch.object(issue_access,'ROOT',kit),mock.patch.object(pathlib.Path,'home',return_value=h),self.assertRaisesRegex(ValueError,'no_longer_active'):issue_access.issue(self.request,output,budget_policy=chosen)
  def test_invalid_bundle_duration_fails_before_registration(self):
   with mock.patch.object(issue_access,'enroll',side_effect=AssertionError('must not register')):
-   with self.assertRaisesRegex(ValueError,'validity'):issue_access.issue(self.request,'unused',hours=169)
+   with self.assertRaisesRegex(ValueError,'validity'):issue_access.issue(self.request,'unused',hours=169,budget_policy={'mode':'unlimited'})
  def test_real_signed_bundle_imports_key_without_prompt(self):
   with tempfile.TemporaryDirectory() as td:
    f=pathlib.Path(td)/'access';f.write_bytes(enrollment.canonical(self.bundle()));prompt=mock.Mock(side_effect=AssertionError('must not prompt'))

@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-19",
-  "kitVersion": "3.1.1",
+  "date": "2026-11-26",
+  "kitVersion": "3.2.0",
   "purpose": "Offline administrator-approved enrollment; new CN never logs into JP",
   "pythonHelperTests": {
     "count": 9,
@@ -285,5 +285,35 @@
     "productionServicesRestarted": false,
     "GUIOpened": false,
     "legacyPilotNoV3StateAdopted": true
+  },
+  "deviceBudgets": {
+    "version": "3.2.0",
+    "explicitQuotaOrUnlimitedRequired": true,
+    "verifiedBeforeBundleDelivery": true,
+    "serverInstance": "deployment.configDir controlled JP instance",
+    "autoModeClassifierUpgradeIncluded": false,
+    "pythonTestsPassed": 55,
+    "nativeJPIsolatedChecksPassed": 8,
+    "nativeUpstream": "synthetic local HTTP, no official API",
+    "productionKeysOrLimitsChanged": false,
+    "freshCNSystemInstallTestedInThisRevision": false,
+    "loadTest20Clients": false,
+    "limits": [
+      "actual usage settles after requests; small overshoot possible",
+      "cost is an estimate and unpriced requests need Token caps",
+      "certificate/key strict one-to-one binding not implemented"
+    ],
+    "coverage": [
+      "missing/invalid quota rejected before registration",
+      "explicit unlimited only",
+      "real certificate issuance recovers from quota CLI failure without output bundle",
+      "duplicate issuance preserves policy and use",
+      "policy drift and unexpected existing limits rejected",
+      "per-key ledger attribution",
+      "exhausted key rejected before upstream; other key works",
+      "restart retains limits",
+      "prior calendar day excluded",
+      "admin preview read-only and single-device update"
+    ]
   }
 }

@@ -1,7 +1,9 @@
 """JP-local administrator helper. Returns secrets in memory; never prints them."""
 import fcntl,hashlib,json,os,pathlib,subprocess,tempfile
+import device_budget
 
-def enroll(request,issuer_source):
+def enroll(request,issuer_source,budget_policy=None):
+ budget_policy=device_budget.validate(budget_policy)
  home=pathlib.Path.home();base=home/'ai/cn-agent-egress-pilot';ca=base/'wg-private'
  deployment=home/'ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json'
  # Reuse the existing deployment only; never initialize a CA or replace a gateway.
@@ -24,6 +26,7 @@ def enroll(request,issuer_source):
    path=records/(device+'.json');name='cn-'+device
    keylist=config/'caller-keys.json';keys=json.loads(keylist.read_text());matches=[x for x in keys if x.get('name')==name]
    if len(matches)>1:raise ValueError('duplicate_device_gateway_key')
+   previous={}
    if path.exists():
     previous=json.loads(path.read_text())
     if previous.get('serial')!=meta['serial'] or not matches or matches[0].get('id')!=previous.get('gateway_key_id') or matches[0].get('off'):raise ValueError('device_key_state_changed')
@@ -40,5 +43,7 @@ def enroll(request,issuer_source):
     matches=[x for x in json.loads(keylist.read_text()) if x.get('name')==name]
     if len(matches)!=1:raise ValueError('gateway_key_record_missing')
     keyid=matches[0]['id'];ns['atomic'](path,json.dumps({'serial':meta['serial'],'gateway_key_id':keyid,'gateway_key':key}).encode())
+   approved=device_budget.ensure(binary,config,keyid,budget_policy,previous.get('budget'))
+   ns['atomic'](path,json.dumps({'serial':meta['serial'],'gateway_key_id':keyid,'gateway_key':key,'budget':approved}).encode())
    return {'device_id':device,'serial':meta['serial'],'gateway_key':key,'gateway_key_id':keyid,'client.pem':(td/'output/client.pem').read_text(),'ca.pem':(td/'output/ca.pem').read_text()}
  finally:fcntl.flock(fd,fcntl.LOCK_UN);os.close(fd)

@@ -4,6 +4,7 @@ import argparse,fcntl,json,os,pathlib,secrets,sys
 ROOT=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import enrollment
 from jp_enroll import enroll
+import device_budget
 
 def signer(ca,hours):
  ca=pathlib.Path(ca);fd=os.open(ca/'bundle-signing.lock',os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600);fcntl.flock(fd,fcntl.LOCK_EX)
@@ -28,7 +29,8 @@ def signer(ca,hours):
   return cert,key
  finally:fcntl.flock(fd,fcntl.LOCK_UN);os.close(fd)
 
-def issue(request,out,hours=48,omit_key=False):
+def issue(request,out,hours=48,omit_key=False,budget_policy=None):
+ budget_policy=device_budget.validate(budget_policy)
  import time
  if type(hours) is not int or not 1<=hours<=168:raise ValueError('bundle_validity_must_be_1_to_168_hours')
  pinned=ROOT/'trust/jp-ca.pem';enrollment.validate_request(request,pinned)
@@ -49,23 +51,31 @@ def issue(request,out,hours=48,omit_key=False):
   keys=json.loads((pathlib.Path(d['configDir'])/'caller-keys.json').read_text());matches=[x for x in keys if x.get('id')==payload['gateway_key_id']]
   if len(matches)!=1 or matches[0].get('off') or record.get('gateway_key_id')!=payload['gateway_key_id'] or record.get('serial')!=payload['serial']:raise ValueError('existing_access_gateway_key_changed')
   if not omit_key and payload['gateway_key']!=record.get('gateway_key'):raise ValueError('existing_access_gateway_key_changed')
-  return {'issued':True,'reused':True,'device_id':request['device_id'],'api_key_included':not omit_key,'out':str(out)}
+  if record.get('budget') is None or device_budget.validate(record['budget'])!=budget_policy or not device_budget.matches(matches[0],budget_policy):raise ValueError('existing_access_budget_changed_or_unverified')
+  return {'budget':budget_policy,'issued':True,'reused':True,'device_id':request['device_id'],'api_key_included':not omit_key,'out':str(out)}
  cert,key=signer(ca,hours)
- delivery=enroll(request,(ROOT/'issue_client.py').read_text())
+ delivery=enroll(request,(ROOT/'issue_client.py').read_text(),budget_policy=budget_policy)
  bundle=enrollment.create_bundle(delivery,request,cert,key,hours,omit_key)
+ # Recheck live server policy before writing a sensitive delivery file.
+ d=enrollment.read(pathlib.Path.home()/'ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json')
+ _,live_key=device_budget.read_key(pathlib.Path(d['configDir']),delivery['gateway_key_id'])
+ if not device_budget.matches(live_key,budget_policy):raise ValueError('budget_changed_before_delivery')
  # Validate everything locally before writing a sensitive delivery file.
  enrollment.verify_bundle(bundle,request,pinned)
  out.parent.mkdir(parents=True,exist_ok=True)
  fd=os.open(out,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
  with os.fdopen(fd,'wb') as f:f.write(enrollment.canonical(bundle));f.flush();os.fsync(f.fileno())
- return {'issued':True,'reused':False,'device_id':request['device_id'],'api_key_included':not omit_key,'valid_hours':hours,'out':str(out),'JP_restart_required':False}
+ return {'budget':budget_policy,'issued':True,'reused':False,'device_id':request['device_id'],'api_key_included':not omit_key,'valid_hours':hours,'out':str(out),'JP_restart_required':False}
 
 def main():
  os.umask(0o077)
- p=argparse.ArgumentParser();p.add_argument('--request',required=True);p.add_argument('--out',required=True);p.add_argument('--approve',action='store_true');p.add_argument('--omit-api-key',action='store_true');p.add_argument('--valid-hours',type=int,default=48);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--request',required=True);p.add_argument('--out',required=True);p.add_argument('--approve',action='store_true');p.add_argument('--omit-api-key',action='store_true');p.add_argument('--valid-hours',type=int,default=48);p.add_argument('--period',choices=['day','week','month']);p.add_argument('--tokens',type=int);p.add_argument('--cost',type=float);p.add_argument('--cache-reads',action='store_true');p.add_argument('--unlimited',action='store_true');a=p.parse_args()
  request=enrollment.read(a.request);enrollment.validate_request(request,ROOT/'trust/jp-ca.pem')
  print(json.dumps({'device_id':request['device_id'],'CSR_digest':request['csr_sha256'],'route':request['route'],'approval_given':a.approve}),flush=True)
- if a.approve:print(json.dumps(issue(request,a.out,a.valid_hours,a.omit_api_key)))
+ if a.approve or any(x is not None for x in [a.period,a.tokens,a.cost]) or a.unlimited or a.cache_reads:
+  chosen=device_budget.policy(a.period,a.tokens,a.cost,a.cache_reads,a.unlimited)
+  print(json.dumps({'budget':chosen,'applied':False}),flush=True)
+ if a.approve:print(json.dumps(issue(request,a.out,a.valid_hours,a.omit_api_key,budget_policy=chosen)))
  else:print('Review device and request through your trusted channel, then rerun with --approve. No registration changed.')
 if __name__=='__main__':
  try:main()
