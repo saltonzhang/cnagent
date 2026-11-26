@@ -1,4 +1,4 @@
-# CN installer kit v3.2.0 — no JP login from CN
+# CN installer kit v3.2.1 — no JP login from CN
 
 Read archive-root `CN-MAC-AI-DEPLOYMENT.md`. On a new CN Mac, its ordinary administrator runs `bash install.sh`. All baseline software is bundled for arm64/Intel. The installer prepares local accounts/software and exports a public device request, then reports **awaiting_admin_access_bundle**, not success.
 
@@ -13,3 +13,5 @@ Default supported workflow is controlled Claude, not Codex tools/controlled VS C
 Default model is group/cn-default, centrally managed on JP, actual model is whatever JP currently configures (recently Sonnet 5.5). Admin uses admin/central_model.py. Existing v3 CNs may preview/apply setup/use_central_model.py; it preserves keys, has per-file rollback, and requires a fresh Claude session. Historical unmanaged pilot migration is refused.
 
 Issuance now requires an explicit --period day|week|month with positive --tokens/--cost, or an explicitly approved --unlimited. Budget setup and verification must succeed before delivery. Use admin/manage_budget.py for per-device status, preview and changes. No current production budgets are changed by installing this kit. See AI-INSTALL-PROMPT.md and AI-ADMIN-PROMPT.md at archive root.
+
+Default controlled process TZ is Asia/Tokyo. Existing managed v3.1.1/v3.2.0 CNs use setup/set_agent_timezone.py preview then --apply, or the small CN-MAC-JST-UPDATE.zip; do not reinstall. System timezone/locale and credentials are unchanged. Reopen the controlled shell; this is not a block on reading host metadata. Legacy unmanaged pilots are refused.

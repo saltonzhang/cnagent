@@ -1,6 +1,6 @@
 {
   "date": "2026-11-26",
-  "kitVersion": "3.2.0",
+  "kitVersion": "3.2.1",
   "purpose": "Offline administrator-approved enrollment; new CN never logs into JP",
   "pythonHelperTests": {
     "count": 9,
@@ -314,6 +314,22 @@
       "restart retains limits",
       "prior calendar day excluded",
       "admin preview read-only and single-device update"
+    ]
+  },
+  "timezoneUpdate": {
+    "default": "Asia/Tokyo",
+    "systemTimezoneChanged": false,
+    "pythonTestsTotal": 63,
+    "newMigrationTests": 8,
+    "freshManagedCNMigrationLiveTested": false,
+    "CN162LegacyLiveDefaultVerified": true,
+    "CN162Offset": "+0900",
+    "CN162OrdinaryOffset": "+0800",
+    "servicesRestarted": false,
+    "limits": [
+      "default environment only, not a host metadata access block",
+      "existing processes require reopening",
+      "legacy pilot not adopted by generic migration"
     ]
   }
 }

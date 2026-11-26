@@ -20,7 +20,7 @@ terminal_color=${COLORTERM:-}
 case "$terminal_color" in truecolor|24bit) ;; *) terminal_color=;; esac
 if [ -t 0 ]; then /bin/stty erase '^?' iutf8; fi
 case "$choice" in shell) command=/bin/zsh;; *) command="@@AGENT_HOME@@/.local/bin/$choice";; esac
-exec /usr/bin/sudo -u @@AGENT_USER@@ /usr/bin/env -i HOME=@@AGENT_HOME@@ USER=@@AGENT_USER@@ LOGNAME=@@AGENT_USER@@ \
+exec /usr/bin/sudo -u @@AGENT_USER@@ /usr/bin/env -i TZ=Asia/Tokyo HOME=@@AGENT_HOME@@ USER=@@AGENT_USER@@ LOGNAME=@@AGENT_USER@@ \
  PATH=@@AGENT_HOME@@/.local/bin:@@PYTHON_BIN_DIR@@:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin \
  TERM="$terminal_type" TERM_PROGRAM="$terminal_program" COLORTERM="$terminal_color" LANG="$terminal_locale" LC_CTYPE="$terminal_locale" \
  HTTP_PROXY=http://127.0.0.1:@@WEB_PROXY_PORT@@ HTTPS_PROXY=http://127.0.0.1:@@WEB_PROXY_PORT@@ \
