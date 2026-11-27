@@ -1,16 +1,15 @@
-# 给新 CN Mac 安装 AI 的提示词（v3.2.2）
+# 新 CN Mac 安装提示词（v3.2.3）
 
-把下面内容交给有本机终端权限的 AI：
+在普通管理员账户有终端权限的 AI 中使用：
 
 ```text
-请实际安装本机的受控 Claude 环境，按 https://github.com/saltonzhang/cnagent/releases/tag/v3.2.2 下载 CN-MAC-AI-DEPLOYMENT-KIT.zip 和同版 SHA256 文件，校验后阅读包内 CN-MAC-AI-DEPLOYMENT.md 及适用 AGENTS.md，安装所有必需软件并完成真实验收，不要只给方案。
-复用现有办公室 WireGuard 和 JP 10.9.8.30；不要覆盖个人 Magpie/Claude、已有试点或修改 JP 模型组、翻译、门禁、审计和开关。主对话使用 JP 统一入口 remote-magpie/group/cn-default，实际模型由 JP 管理员决定。
-先生成本设备 .request.json，告诉我文件路径，等待管理员确认设备、设置并核验独立 Key 的额度后交付 .access.json；拿到文件后继续导入安装。不替管理员决定额度，不默认不限额，不使用他人 Key。等待授权不能报告安装完成。
-新 CN 不得 SSH 登录 JP、索取 JP 管理凭据或复制其他设备私钥。API Key 默认随接入包自动配置；若省略，只让我在本机隐藏输入，不发到聊天。接入包含秘密，不打印或上传仓库。
-验收专用 cnagent/iTerm JP Agent、真实 Claude 回答和工具、日本出口、无法代理时禁止国内直连、普通终端/VS Code 无法借用受控入口、私钥不可读及退格键正常；GUI 权限不足请明确等待人工验收。
-不要执行 git push、改变网络放行范围或关闭门禁。超额 429 要报告管理员，不通过换 Key 或路由绕过。只有全部必需验收通过才报告可用，并交付启动、诊断、回滚说明。
-验收受控 shell 默认 TZ=Asia/Tokyo、date 显示 JST/+0900，普通终端系统时区不改；这不是禁止读取本机元数据。已有受管理 CN 应走 AI-UPDATE-PROMPT.md 的小更新包流程，不重装。
-本版 Claude 仍为已锁定基线；不要擅自启用尚未发布的新版分类修复或升级软件。
+请按 https://github.com/saltonzhang/cnagent/releases/tag/v3.2.3 实际安装本机受控 Claude 环境，不要只给方案。
+下载同版 CN-MAC-AI-DEPLOYMENT-KIT.zip 和 SHA256，校验后阅读包内 CN-MAC-AI-DEPLOYMENT.md、适用 AGENTS.md，先检查系统、账户、端口及已有安装，安装所有必要软件。未知试点或账户冲突时停止，不删除状态绕过。
+按 162 当前配置规则：Claude 默认 model=sonnet；ANTHROPIC_DEFAULT_SONNET_MODEL、ANTHROPIC_DEFAULT_OPUS_MODEL、ANTHROPIC_DEFAULT_HAIKU_MODEL 全部指向 remote-magpie/group/cn-default，实际模型由 JP 统一选择。菜单可以保留多个 Custom 标签；不隐藏菜单、不新加模型白名单、不强制 effort。Claude 保持 2.1.198；新装 CN 前端 Magpie 为经验证的官方 0.1.4777；JP 定制核心不替换，不加入未接入的分类修复。
+复用办公室现有 WireGuard 和 JP 10.9.8.30。CN 不 SSH 登录 JP，不索取其管理凭据。逐机生成私钥和 request.json，告诉我申请文件路径，等待管理员确认设备并设置、核验独立 Key 的额度后返回 access.json，再导入继续安装；不自行默认不限额，不共享其他设备 Key。
+接入包含秘密，Key 默认自动配置；如管理员省略 Key，仅通过本机隐藏输入。不打印 Key、私钥、接入包正文，不上传到仓库。
+保留现有翻译、门禁、审计和两个开关，失败不能回退国内直连。不要复制 162 的设备身份、UID、Mobile 路由或专用 SSH 授权；这些不属于通用基线。
+使用 JP Agent Profile 或新建的 Start-JP-Agent-Fresh.command 进入专用账户；不要安装 iTerm Claude 集成或重置个人偏好。要退出旧 Claude 和旧父 shell，再新开会话，不能把恢复旧终端当作新沙箱。
+实际验收 Claude 回答与工具调用、日本出口、普通账户不能借用受控入口、私钥不可读、readlink /etc/localtime 被拒绝、date 为 JST/+0900、普通账户保留系统时区、退格键和 TUI 正常。GUI 授权不足明确等待人工，未完成不能称为可用。
+不要执行 git push。交付版本、设备 ID、无秘密路径、真实验收结果、启动方法及诊断/回滚说明。
 ```
-
-验收补充：在新受控进程确认 readlink /etc/localtime 与 /private/etc/localtime 均失败、不返回目标，date 保持 JST；普通账户仍可读取原系统设置。必须新开会话复验，旧历史中已经暴露的时区不会自动消除。只声明已验证的入口，不能承诺彻底隐藏本机位置。

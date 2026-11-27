@@ -1,23 +1,23 @@
-# CNAGENT v3.2.2
+# CNAGENT v3.2.3
 
 受控 Claude、本机独立 Magpie 与 JP 网络出口。新 CN 不获得 JP SSH 管理权限。
 
-- [新 CN 完整安装包](https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-AI-DEPLOYMENT-KIT.zip) · [SHA256](https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
-- **已装 v3.1.1 / v3.2.0 / v3.2.1 无需重装**：[日本时区小更新包](https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-JST-UPDATE.zip) · [SHA256](https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-JST-UPDATE.zip.sha256) · [步骤与回滚](CN-MAC-JST-UPDATE-README.md)
+- [新 CN 完整安装包](https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-AI-DEPLOYMENT-KIT.zip) · [SHA256](https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256)
+- **已装 v3.1.1 / v3.2.0 / v3.2.1 无需重装**：[日本时区小更新包](https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-JST-UPDATE.zip) · [SHA256](https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-JST-UPDATE.zip.sha256) · [步骤与回滚](CN-MAC-JST-UPDATE-README.md)
 - [新 CN 安装 AI 提示词](AI-INSTALL-PROMPT.md)
 - [已安装 CN 增量更新 AI 提示词](AI-UPDATE-PROMPT.md)
 - [管理 CN 签发与设置额度 AI 提示词](AI-ADMIN-PROMPT.md)
-- [CN 完整手册](CN-MAC-AI-DEPLOYMENT.md) · [JP 管理手册](JP-MAC-DEVICE-ENROLLMENT.md) · [Release](https://github.com/saltonzhang/cnagent/releases/tag/v3.2.2)
+- [CN 完整手册](CN-MAC-AI-DEPLOYMENT.md) · [JP 管理手册](JP-MAC-DEVICE-ENROLLMENT.md) · [Release](https://github.com/saltonzhang/cnagent/releases/tag/v3.2.3)
 
 新 CN：校验完整 Release ZIP → 安装依赖与独立账户 → 导出 request.json → 管理员确认设备及额度 → 签发 access.json → CN 导入并完成真实验收。不能直接从缺少软件/二进制的源码目录安装。
 
-管理员使用[同版管理员 ZIP](https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/JP-MAC-ENROLLMENT-ADMIN-KIT.zip)及[校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/JP-MAC-ENROLLMENT-ADMIN-KIT.zip.sha256)。额度工具 v3.2.0 与本版兼容，JP 不需要因时区变化重装、重启、重签或更改现有额度。
+管理员使用[同版管理员 ZIP](https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/JP-MAC-ENROLLMENT-ADMIN-KIT.zip)及[校验文件](https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/JP-MAC-ENROLLMENT-ADMIN-KIT.zip.sha256)。额度工具 v3.2.0 与本版兼容，JP 不需要因时区变化重装、重启、重签或更改现有额度。
 
 ## 时区更新
 
 新安装的受控启动器默认 TZ=Asia/Tokyo，date 显示 JST/UTC+09:00；系统时区与语言保持原样。已安装设备用小更新包中的 set_agent_timezone.py 先预览，再 --apply，不重跑完整安装器。只修改受控启动器的一处环境变量，不修改证书、Key、额度、模型、代理、PF 或服务配置。退出旧 Claude 和受控 shell，再从原入口打开生效。已生效时重复运行不修改；提供备份和冲突检测回滚。
 
-通用更新只接管身份匹配的 v3 安装，拒绝未知/历史试点，不得伪造安装记录。162 试点已单独验证 JST/+0900、普通终端 +0800，无需重复更新。更新旧设备不修改保存的旧版安装器；以后完整恢复时使用 v3.2.2，避免旧 configure 恢复旧模板。
+通用更新只接管身份匹配的 v3 安装，拒绝未知/历史试点，不得伪造安装记录。162 试点已单独验证 JST/+0900、普通终端 +0800，无需重复更新。更新旧设备不修改保存的旧版安装器；以后完整恢复时使用 v3.2.3，避免旧 configure 恢复旧模板。
 
 这是默认显示设置，不是阻止系统元数据读取。命令仍在 CN 执行，覆盖 TZ 或读取系统文件仍可能识别本机设置。
 
@@ -29,12 +29,22 @@ JP 签发必须明确 --period day|week|month 配合正数 --tokens/--cost，或
 
 ## 验证边界
 
-65 项 Python 测试通过（新增 10 项时区增量测试）。此前当前 JP 核心的 8 项独立预算检查保留，结果见 [BUDGET-VALIDATION.json](BUDGET-VALIDATION.json)。这不是新 CN 的系统安装或 20 人压测。新机必须完成真实工具、日本出口、普通账户拒绝和界面验收。
+71 项 Python 测试通过（新增 10 项时区增量测试）。此前当前 JP 核心的 8 项独立预算检查保留，结果见 [BUDGET-VALIDATION.json](BUDGET-VALIDATION.json)。这不是新 CN 的系统安装或 20 人压测。新机必须完成真实工具、日本出口、普通账户拒绝和界面验收。
 
 随包软件基线不变，Claude 仍为 2.1.198；尚待确认的 2.1.302/Codex 分类修复未包含。普通 VS Code 和 Codex 工具链不宣称已支持。
 
-## v3.2.2: host timezone file guard
+## v3.2.3: host timezone file guard
 
 v3.2.1 only set TZ. This release also denies Agent file-read* on /etc/localtime and /private/etc/localtime. The launcher reads the current network sandbox and appends the deny, preserving its rules; services keep their original profile. Actual CN162 probes denied readlink/lstat/read/stat/ls, kept JST/Python, and passed a real Claude OK and proxy HEAD 200. See [evidence](TIMEZONE-FILE-GUARD-VALIDATION.json).
 
 Existing v3.1.1/v3.2.0/v3.2.1 users apply the small update, without reinstalling. CN162 was updated separately. Reopen the controlled shell and START A NEW CONVERSATION: old history is not erased. This covers tested paths, not every system API or location inference. JP and quotas stay unchanged.
+
+## v3.2.3: match the current CN162 defaults
+
+Default Claude selection is sonnet. ANTHROPIC_DEFAULT_SONNET_MODEL / OPUS_MODEL / HAIKU_MODEL all map to remote-magpie/group/cn-default; JP chooses the real model (last checked Sonnet 5.5). Menus may still contain multiple Custom rows and local pricing/context labels. No model allowlist, hidden menu, forced effort or classifier backend change is introduced. Software baseline stays pinned.
+
+Fresh installs add a per-operator Start-JP-Agent-Fresh.command, preserving unrelated existing files. The small update now includes set_agent_defaults.py: preview, then --apply, alongside the timezone helper. For an existing managed central-group device it changes only Claude default model/aliases, preserving effort, auth, permissions, providers, enrollment request and quotas. Each helper has separate conflict-detecting rollback backups. Non-group installations need explicit central-model migration first; legacy CN162 is not adopted and needs no repeat update.
+
+[Read-only live CN162 baseline](CN162-BASELINE-VALIDATION.json). 71 Python tests passed. No new blank-CN system installation or production JP change was performed in this release. Device certificate/key, UID, Mobile relay and special SSH grants are not cloned from CN162.
+
+New installations bundle official Magpie 0.1.4777 to match CN162, with both architectures checked against GitHub SHA256 and code signatures. Both declare macOS 12.0 minimum; actual target acceptance remains mandatory. The six native bridge checks use only temporary HOME/config and synthetic loopback upstream. The small existing-device update does not replace an active frontend binary; that requires a separate coordinated local-service upgrade. JP custom core and accounts are untouched; Claude stays 2.1.198.

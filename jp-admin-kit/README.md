@@ -1,1 +1,1 @@
-JP administrator kit v3.2.2. Read JP-MAC-DEVICE-ENROLLMENT.md. Explicit per-device budget or approved unlimited is required before issuance; existing policies are not changed on installation. No secrets included.
+JP administrator kit v3.2.3. Read JP-MAC-DEVICE-ENROLLMENT.md. Explicit per-device budget or approved unlimited is required before issuance; existing policies are not changed on installation. No secrets included.

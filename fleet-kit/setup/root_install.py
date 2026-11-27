@@ -125,6 +125,14 @@ def prepare(c,j,save,b):
  return {'prepared':True,'device_id':c['device_id'],'request':request,'already_configured':bool(j.get('configured') and j.get('accepted_bundle_sha256'))}
 
 
+def install_fresh_entry(home,content,uid,gid):
+ desktop=pathlib.Path(home)/'Desktop'
+ if desktop.is_symlink() or desktop.exists() and (not desktop.is_dir() or desktop.stat().st_uid!=uid):return False
+ if not desktop.exists():desktop.mkdir(mode=0o700);os.chown(desktop,uid,gid)
+ target=desktop/'Start-JP-Agent-Fresh.command'
+ if target.is_symlink() or target.exists() and (not target.is_file() or target.stat().st_uid!=uid or target.read_bytes()!=content):return False
+ write(target,content,0o700,uid,gid);return True
+
 def configure(c,j,save,b,payload):
  if not j.get('prepared'):raise ValueError('prepare_first')
  request=enrollment.read(b/'private/enrollment-request.json')
@@ -155,7 +163,7 @@ def configure(c,j,save,b,payload):
   profile=pathlib.Path(c['operator_home'])/'Library/Application Support/iTerm2/DynamicProfiles/CN-Agent-WireGuard.json'
   # Back up only the exact file we own, never reset all iTerm settings.
   if profile.exists() and not j.get('configured'):write(b/'private/profile.before',profile.read_bytes())
-  op=pwd.getpwnam(c['operator_user']);profile.parent.mkdir(parents=True,exist_ok=True)
+  op=pwd.getpwnam(c['operator_user']);j['fresh_desktop_entry']=install_fresh_entry(op.pw_dir,(stage/'Start-JP-Agent-Fresh.command').read_bytes(),op.pw_uid,op.pw_gid);profile.parent.mkdir(parents=True,exist_ok=True)
   # New parent hierarchy must belong to the operator rather than root.
   for parent in [profile.parent,profile.parent.parent]:os.chown(parent,op.pw_uid,op.pw_gid)
   write(profile,(stage/'CN-Agent-WireGuard.json').read_bytes(),uid=op.pw_uid,gid=op.pw_gid)

@@ -5,6 +5,7 @@ ROOT=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import enrollment
 from root_install import write
 MODEL='group/cn-default'
+ALIASES=['ANTHROPIC_DEFAULT_SONNET_MODEL','ANTHROPIC_DEFAULT_OPUS_MODEL','ANTHROPIC_DEFAULT_HAIKU_MODEL']
 def main():
  p=argparse.ArgumentParser();p.add_argument('--apply',action='store_true');p.add_argument('--rollback');p.add_argument('--config',default='/Library/Application Support/CN-Agent-Egress/private/config.json');a=p.parse_args()
  if os.getuid()!=0:raise ValueError('local_root_required')
@@ -26,14 +27,15 @@ def main():
  claude=json.loads(paths[1].read_text());request=enrollment.read(paths[3]);enrollment.validate_request(request,ROOT/'trust/jp-ca.pem')
  print(json.dumps({'before':c['jp_model_id'],'after':MODEL,'apply':a.apply,'restartRequired':False}))
  if not a.apply:return
- if c['jp_model_id']==MODEL and claude.get('model')=='remote-magpie/'+MODEL and MODEL in matches[0].get('models',[]) and not matches[0].get('preset') and matches[0].get('responses')=='http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1':return
+ if c['jp_model_id']==MODEL and claude.get('model')=='sonnet' and all(claude.get('env',{}).get(k)=='remote-magpie/'+MODEL for k in ALIASES) and MODEL in matches[0].get('models',[]) and not matches[0].get('preset') and matches[0].get('responses')=='http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1':return
  backup=base/'private/central-model-backups'/datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');backup.mkdir(parents=True,mode=0o700)
  for i,path in enumerate(paths):write(backup/(str(i)+'.before'),path.read_bytes())
  write(backup/'paths.json',json.dumps([str(x) for x in paths]))
- matches[0].pop('preset',None);matches[0].pop('chat',None);matches[0].pop('anthropic',None);matches[0]['responses']='http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1';matches[0]['models']=list(dict.fromkeys(matches[0].get('models',[])+[MODEL]));claude['model']='remote-magpie/'+MODEL;c['jp_model_id']=MODEL
- request=enrollment.request_for(c,request['csr'],secrets.token_hex(32),int(__import__('time').time()),ROOT/'trust/jp-ca.pem')
- write(paths[0],json.dumps(providers,indent=2),uid=agent.pw_uid,gid=agent.pw_gid);write(paths[1],json.dumps(claude,indent=2),uid=agent.pw_uid,gid=agent.pw_gid);write(config,json.dumps(c,indent=2));write(paths[3],enrollment.canonical(request))
- print(json.dumps({'migrated':True,'backup':str(backup),'keysAndCertificatesUnchanged':True,'newClaudeSessionRequired':True,'oldAccessBundleMustNotBeReimported':True}))
+ matches[0].pop('preset',None);matches[0].pop('chat',None);matches[0].pop('anthropic',None);matches[0]['responses']='http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1';matches[0]['models']=list(dict.fromkeys(matches[0].get('models',[])+[MODEL]));claude['model']='sonnet';claude.setdefault('env',{}).update({k:'remote-magpie/'+MODEL for k in ALIASES});route_changed=c['jp_model_id']!=MODEL;c['jp_model_id']=MODEL
+ if route_changed:request=enrollment.request_for(c,request['csr'],secrets.token_hex(32),int(__import__('time').time()),ROOT/'trust/jp-ca.pem')
+ write(paths[0],json.dumps(providers,indent=2),uid=agent.pw_uid,gid=agent.pw_gid);write(paths[1],json.dumps(claude,indent=2),uid=agent.pw_uid,gid=agent.pw_gid);write(config,json.dumps(c,indent=2));
+ if route_changed:write(paths[3],enrollment.canonical(request))
+ print(json.dumps({'migrated':True,'backup':str(backup),'keysAndCertificatesUnchanged':True,'newClaudeSessionRequired':True,'oldAccessBundleMustNotBeReimported':route_changed,'requestUnchanged':not route_changed,'effortPolicyChanged':False}))
 if __name__=='__main__':
  try:main()
  except Exception as e:print('Migration stopped: '+(str(e) if isinstance(e,ValueError) else type(e).__name__),file=sys.stderr);sys.exit(1)

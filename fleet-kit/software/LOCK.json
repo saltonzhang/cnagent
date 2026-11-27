@@ -1,19 +1,19 @@
 {
   "schema": 1,
-  "date": "2026-11-18",
+  "date": "2026-11-27",
   "files": {
     "magpie-darwin-amd64.zip": {
-      "version": "0.1.3032",
-      "sha256": "bcba53dd8dedf4c1b74e4946a94afe4e8170518baeeff0925adffe2e23d07849",
-      "source": "https://github.com/yetone/magpie-releases/releases/download/v0.1.3032/magpie-darwin-amd64.zip",
-      "upstreamIntegrity": "sha256:bcba53dd8dedf4c1b74e4946a94afe4e8170518baeeff0925adffe2e23d07849",
+      "version": "0.1.4777",
+      "sha256": "5c6dd6299c30da2537369615efc1988cb3ed25d1580897e511a66f7e23989dfc",
+      "source": "https://github.com/yetone/magpie-releases/releases/download/v0.1.4777/magpie-darwin-amd64.zip",
+      "upstreamIntegrity": "sha256:5c6dd6299c30da2537369615efc1988cb3ed25d1580897e511a66f7e23989dfc",
       "signerTeam": "LY7MVTUDZG"
     },
     "magpie-darwin-arm64.zip": {
-      "version": "0.1.3032",
-      "sha256": "b8235934edf33d095836a3c5095409b28f82aad1ef5daa83587f7bf122d8399e",
-      "source": "https://github.com/yetone/magpie-releases/releases/download/v0.1.3032/magpie-darwin-arm64.zip",
-      "upstreamIntegrity": "sha256:b8235934edf33d095836a3c5095409b28f82aad1ef5daa83587f7bf122d8399e",
+      "version": "0.1.4777",
+      "sha256": "22b19bc89830c062d461642cdc446970c2a3a3d921f427de147a40eabf05245f",
+      "source": "https://github.com/yetone/magpie-releases/releases/download/v0.1.4777/magpie-darwin-arm64.zip",
+      "upstreamIntegrity": "sha256:22b19bc89830c062d461642cdc446970c2a3a3d921f427de147a40eabf05245f",
       "signerTeam": "LY7MVTUDZG"
     },
     "claude-arm64.tgz": {

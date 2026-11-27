@@ -13,7 +13,7 @@ class RenderTests(unittest.TestCase):
     text=p.read_text(errors='replace') if p.suffix!='.plist' else ''
     self.assertNotIn('@@',text);self.assertNotIn('salton-',text);self.assertNotIn('10.9.8.30',text)
    launch=(out/'launch').read_text();self.assertIn('TERM="$terminal_type"',launch);self.assertNotIn('claude|codex|shell',launch)
-   subprocess.run(['/bin/bash','-n',str(out/'launch')],check=True)
+   subprocess.run(['/bin/bash','-n',str(out/'launch')],check=True);subprocess.run(['/bin/bash','-n',str(out/'Start-JP-Agent-Fresh.command')],check=True)
    compile((out/'supervisor.py').read_text(),str(out/'supervisor.py'),'exec');compile((out/'probe.py').read_text(),str(out/'probe.py'),'exec')
    pf=(out/'pilot.pf').read_text();self.assertIn('user teamnet flags any',pf);self.assertIn('to 10.20.30.40',pf)
    self.assertIn('__READ_FROM_PROTECTED_DEVICE_KEY_FILE__',(out/'providers.template.json').read_text())

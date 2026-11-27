@@ -1,6 +1,6 @@
 {
   "date": "2026-11-27",
-  "kitVersion": "3.2.2",
+  "kitVersion": "3.2.3",
   "purpose": "Offline administrator-approved enrollment; new CN never logs into JP",
   "pythonHelperTests": {
     "count": 9,
@@ -335,5 +335,29 @@
     "CN162RealModelReplyPassedWithGuard": true,
     "CN162ProxyHEADPassedWithGuard": true,
     "oldConversationHistoryCleared": false
+  },
+  "CN162BaselineRelease": {
+    "model": "sonnet",
+    "aliasTarget": "remote-magpie/group/cn-default",
+    "allThreeDefaultAliases": true,
+    "effortForced": false,
+    "serverModelAllowListAdded": false,
+    "identityKeysOrCredentialsCopied": false,
+    "CN162ProductionChangedInThisRevision": false,
+    "totalPythonTestsPassed": 71,
+    "freshCNInstallTested": false,
+    "existingDeviceMigrationPreserves": [
+      "auth",
+      "permissions",
+      "effort",
+      "providers",
+      "signed request when group unchanged"
+    ],
+    "freshDesktopEntry": "does not overwrite existing unrelated file",
+    "frontendMagpieVersion": "0.1.4777",
+    "existingCNBinaryUpgradePerformed": false,
+    "signatureAndMinimumOSVerifiedBothArchitectures": true,
+    "ClaudeCodeUpdated": false,
+    "nativeFrontendChecksPassed": 6
   }
 }

@@ -97,4 +97,10 @@ class InstallerTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as td:
    h=pathlib.Path(td);f=h/'binary';f.write_text('changed');d=h/'ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json';d.parent.mkdir(parents=True);d.write_text(json.dumps({'binary':str(f),'binarySHA256':'0'*64,'configDir':str(h)}))
    with mock.patch.object(pathlib.Path,'home',return_value=h),self.assertRaisesRegex(ValueError,'pin_changed'):jp.enroll({},'',budget_policy={'mode':'unlimited'})
+ def test_fresh_desktop_entry_owned_and_executable(self):
+  with tempfile.TemporaryDirectory() as td:
+   content=b'#!/bin/bash\nexit 0\n';self.assertTrue(ri.install_fresh_entry(td,content,os.getuid(),os.getgid()));p=pathlib.Path(td)/'Desktop/Start-JP-Agent-Fresh.command';self.assertEqual(p.read_bytes(),content);self.assertEqual(p.stat().st_mode&0o777,0o700)
+ def test_fresh_desktop_entry_preserves_existing_unknown_file(self):
+  with tempfile.TemporaryDirectory() as td:
+   p=pathlib.Path(td)/'Desktop';p.mkdir();file=p/'Start-JP-Agent-Fresh.command';file.write_bytes(b'keep my existing file');self.assertFalse(ri.install_fresh_entry(td,b'replacement',os.getuid(),os.getgid()));self.assertEqual(file.read_bytes(),b'keep my existing file')
 if __name__=='__main__':unittest.main()

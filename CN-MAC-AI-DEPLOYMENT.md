@@ -1,12 +1,12 @@
 # CN MAC 安装部署手册：交给 AI 执行
 
-手册/发行版 3.2.2（受控 Agent 时区文件拦截）· 2026-11-27。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
+手册/发行版 3.2.3（与 162 当前默认配置对齐）· 2026-11-27。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
 
 ## 直接交给另一台电脑的 AI
 
 新 CN 不必先手动复制安装包。把下面这段指令发给有本机终端权限的 AI，它应先从 GitHub 读取本手册，再下载同版 Release。已复制文件的离线方式仍可使用。
 
-> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.2.2 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；管理员必须为本设备设置并核验额度，或明确批准不限额，之后才可交付签名接入包。拿到接入包后继续安装。不要自行决定额度或使用其他设备的 Key。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
+> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.2.3 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；管理员必须为本设备设置并核验额度，或明确批准不限额，之后才可交付签名接入包。拿到接入包后继续安装。不要自行决定额度或使用其他设备的 Key。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
 
 执行 AI 需要有这台 CN MAC 的终端执行权限；只有聊天能力不能安装。软件已随包携带，不要求新电脑预先安装 Homebrew、Node 或 Python。CN 只需要本机管理员授权；JP 的管理认证仅发生在管理员自己的电脑或 JP 本机，不能在新 CN 上进行。设备授权仍需要管理员审批：CN 先生成申请，管理员在 JP 签发接入包，CN 导入后继续。因此这是可恢复的两阶段安装，不是无需任何授权的自助入网。**包内不含任何密码、设备私钥、JP CA 私钥或 Gateway Key。**
 
@@ -14,7 +14,7 @@
 
 ## JP 统一管理模型（v3.2.0）
 
-新 CN 的默认模型为 `remote-magpie/group/cn-default`，CN Magpie 的远程模型入口为 `group/cn-default`。实际模型取决于 JP 当前组配置；不要在新 CN 安装时把 JP 组改回旧版手册中的 Opus。主对话保持管理员当前选择（最近核对为 Sonnet 5.5）。今后只改 JP 的组成员，CN 不需要逐台改实际模型 ID；设备账号、证书、Key、翻译和门禁策略保持原有配置。
+新 CN 的 Claude 默认选择为 `sonnet`，其 Sonnet/Opus/Haiku 三个别名都映射到 `remote-magpie/group/cn-default`，CN Magpie 的远程模型入口为 `group/cn-default`。实际模型取决于 JP 当前组配置；不要在新 CN 安装时把 JP 组改回旧版手册中的 Opus。主对话保持管理员当前选择（最近核对为 Sonnet 5.5）。今后只改 JP 的组成员，CN 不需要逐台改实际模型 ID；设备账号、证书、Key、翻译和门禁策略保持原有配置。
 
 管理员仅在 JP 本机（或指定管理 CN SSH 到 JP）运行：
 
@@ -56,7 +56,7 @@ sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14   /绝对
 |---|---|---|
 | iTerm2 | 3.7.7，官方签名通用 App | 已有签名正确的 iTerm 时复用；缺失时安装。只加独立 Profile，不安装 Claude 集成、不重置用户偏好 |
 | Claude Code | 2.1.198，官方 npm 平台包中的签名原生程序，arm64/x64 | 安装到专用账户 `.local/bin/claude`；不依赖 Node，不复制普通账户历史或登录凭证 |
-| Magpie | 0.1.3032，官方 arm64/Intel App | 独立安装到本工具的 root 管理目录，使用专用账户配置；不覆盖用户的 `/Applications/magpie.app` |
+| Magpie | 0.1.4777，官方 arm64/Intel App | 独立安装到本工具的 root 管理目录，使用专用账户配置；不覆盖用户的 `/Applications/magpie.app` |
 | Python | 3.14.10，Python.org 签名通用 PKG | 缺少受信任的 3.14 Framework 时自动安装，供安装器和守护程序使用 |
 | 出口适配器 | 本套已验证 Go 程序，两个架构 | 直接安装随包二进制，不在新电脑安装 Go 编译器 |
 | PF、sandbox-exec、launchd、curl、zsh | macOS 自带 | 检查可用性；不下载替代系统组件 |
@@ -101,8 +101,8 @@ fleet-kit/
 ```bash
 mkdir -p ~/Downloads/cnagent-v3.2.1
 cd ~/Downloads/cnagent-v3.2.1
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
 cd installer/fleet-kit
@@ -267,7 +267,7 @@ CN 不再有任何自动 SSH 登录 JP 的步骤，也不增加 JP 用户或 SSH
 
 交付时输出：设备 ID、版本、无秘密路径、各验收结果、Profile 使用方式、尚未授权的项目/未完成项、停止/回滚入口。不得输出认证信息或声称跳过的步骤完成。不需要做人数规划或并发评估，本手册专注于把当前整套环境装到这台新 CN。
 
-官方来源：[iTerm2](https://iterm2.com/downloads.html)、[Magpie 官方发布](https://github.com/yetone/magpie-releases/releases/tag/v0.1.3032)、[Claude 安装说明](https://code.claude.com/docs/en/setup)、[Python 3.14.10](https://www.python.org/downloads/release/python-31410/)。
+官方来源：[iTerm2](https://iterm2.com/downloads.html)、[Magpie 官方发布](https://github.com/yetone/magpie-releases/releases/tag/v0.1.4777)、[Claude 安装说明](https://code.claude.com/docs/en/setup)、[Python 3.14.10](https://www.python.org/downloads/release/python-31410/)。
 
 ## v3.0.2 安装权限修复与验证范围
 
@@ -313,8 +313,8 @@ CN 安装步骤及签名接入包格式保持兼容；主要更新在 JP 签发�
 ```bash
 mkdir -p ~/Downloads/cnagent-jst-v3.2.2
 cd ~/Downloads/cnagent-jst-v3.2.2
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-JST-UPDATE.zip -o CN-MAC-JST-UPDATE.zip
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-JST-UPDATE.zip.sha256 -o CN-MAC-JST-UPDATE.zip.sha256
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-JST-UPDATE.zip -o CN-MAC-JST-UPDATE.zip
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.3/CN-MAC-JST-UPDATE.zip.sha256 -o CN-MAC-JST-UPDATE.zip.sha256
 shasum -a 256 -c CN-MAC-JST-UPDATE.zip.sha256
 # 校验成功且目标目录不存在后再解压，禁止与其他版本混合。
 unzip CN-MAC-JST-UPDATE.zip -d updater
@@ -349,3 +349,38 @@ v3.2.1 只设置 TZ，仍可通过 `readlink /etc/localtime` 看到宿主系统�
 已装 v3.1.1、v3.2.0、v3.2.1 均使用同版小更新包，按上文先预览再 --apply；仅 TZ 已生效也会补上文件拦截。管理员 v3.2.0 额度工具不受影响，JP 不重启。通用工具仍拒绝接管无安装记录的历史试点；162 已单独接入，不需重复运行。
 
 退出旧 Claude 和受控 shell，新开会话验证；旧会话已经包含的 Asia/Shanghai 工具结果不会被删除，也不会让 Agent 忘记历史。以后完整 configure 使用 v3.2.2，以免旧模板覆盖新规则。保留语言，不保证星期文字变成英文。
+
+
+## v3.2.3：按 162 当前配置发布
+
+默认 Claude 选择 `sonnet`；用户设置中的 `ANTHROPIC_DEFAULT_SONNET_MODEL`、`ANTHROPIC_DEFAULT_OPUS_MODEL`、`ANTHROPIC_DEFAULT_HAIKU_MODEL` 均为 `remote-magpie/group/cn-default`。菜单仍可能显示 Custom Sonnet/Opus/Haiku 多行，但路由都是同一个 JP 组；不要用菜单标签、[1m] 提示或价格文字确认实际模型/计费。实际模型由 JP 组决定，最近核对为 Sonnet 5.5。
+
+这不是模型白名单，也没有禁用模型菜单。effort 不强制，不设置新限制，保留已有选择。没有加入尚待确认的 Codex 分类修复；Claude 仍为锁定的软件基线 2.1.198，自动更新默认关闭。
+
+新安装在普通操作者桌面增加 `Start-JP-Agent-Fresh.command`（若同名文件已存在且不同，保留原文件）。它调用当前 root 管理的 launch，不授予额外 sudo 权限，不安装 iTerm Claude 集成。必须退出旧 Claude 和旧父 shell，再进入新入口；终端恢复旧窗口不代表已加载新沙箱。
+
+已有 v3.1.1 / v3.2.0 / v3.2.1 / v3.2.2 不重装。新版小更新包继续提供时区工具，新增 `set_agent_defaults.py`，在已使用 group/cn-default 的设备上只改 Claude 默认项及三个别名；证书、Key、额度、登记申请、代理、模型提供商和 effort 保持原样。两个工具分别先预览，再 --apply：
+
+```bash
+sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 set_agent_timezone.py
+sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 set_agent_defaults.py
+sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 set_agent_timezone.py --apply
+sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 set_agent_defaults.py --apply
+```
+
+已有设置已匹配时不重复修改。两个工具会分别输出备份目录；使用对应工具的 `--rollback /备份目录` 先预览、再加 `--apply` 回滚。存在后续修改时拒绝覆盖。旧设备的旧安装器源码不被小包修改，未来完整 configure 应使用 v3.2.3。
+
+非中央组路由的更早安装会拒绝套用新默认值，先按完整包中的 `setup/use_central_model.py` 预览迁移。对于已经使用同一组的设备，更新别名不再重新生成登记申请；协议仍为本机 Messages 转 Responses，保留 Key 与其他供应商。
+
+162 历史试点已处于该基线，不进行重复迁移，也不伪造 v3 安装记录。只复用配置规则，不复制 162 的私钥、证书、Key、UID、Mobile 中转设置或专用 SSH 目标权限。新 CN 仍逐机登记、签发与限额。
+
+本版完成 71 项 Python 测试，未在另一台空白 CN 做完整系统安装；每台设备必须完成实际回答、工具、日本出口、时区文件拒绝、普通账户隔离和界面验收。
+
+
+### v3.2.3 软件基线说明
+
+只读核对发现 162 的 Magpie 已为 0.1.4777；因此本版新安装包将 CN 前端 Magpie 对齐到官方 0.1.4777，而不是继续携带旧版 0.1.3032。两个架构的 ZIP 均校验官方 GitHub SHA256，代码签名 Team ID 为 LY7MVTUDZG，App 声明最低 macOS 12.0（仍须在实际目标系统验收）。Intel 与 Apple Silicon 各完成隔离 Messages→Responses 的普通请求、工具调用/结果 ID、流式完成检查，使用模拟回环上游，没有读取生产账号。
+
+这是 **CN 前端软件**，不会替换 JP 的定制核心，也不修改 JP 官方 App、账号或模型组。Claude Code 仍保持 2.1.198，没有加入待确认的 2.1.302 分类修复。
+
+已有 CN 的小更新包只对齐配置，不热替换已运行的 Magpie；完整安装器也会复用已有的受管理 App。需要把旧 CN 的前端二进制从 0.1.3032 升到 0.1.4777 时，应另做备份、兼容检查并协调其本机服务切换，不可在运行中直接覆盖。配置对齐不会冒充软件已经升级。

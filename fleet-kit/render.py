@@ -49,7 +49,7 @@ def render(raw,out):
  # only when installing the dedicated providers.json on the target machine.
  provider={'providers':[{'id':'remote-magpie','name':'jp','key':'__READ_FROM_PROTECTED_DEVICE_KEY_FILE__','responses':'http://127.0.0.1:'+str(c['api_adapter_port'])+'/v1','proxy':'direct','models':[c['jp_model_id']]}]}
  (out/'providers.template.json').write_text(json.dumps(provider,indent=2));(out/'settings.json').write_text(json.dumps({'lan':False,'proxy':'direct'}))
- (out/'claude-settings.json').write_text(json.dumps({'env':{'ANTHROPIC_BASE_URL':'http://127.0.0.1:'+str(c['cn_api_port']),'ANTHROPIC_AUTH_TOKEN':'cnagent-local'},'model':'remote-magpie/'+c['jp_model_id']},indent=2))
+ (out/'claude-settings.json').write_text(json.dumps({'env':{'ANTHROPIC_BASE_URL':'http://127.0.0.1:'+str(c['cn_api_port']),'ANTHROPIC_AUTH_TOKEN':'cnagent-local',**{k:'remote-magpie/'+c['jp_model_id'] for k in ['ANTHROPIC_DEFAULT_SONNET_MODEL','ANTHROPIC_DEFAULT_OPUS_MODEL','ANTHROPIC_DEFAULT_HAIKU_MODEL']}},'model':'sonnet'},indent=2))
  label='local.cn-agent-wireguard.controlled'
  job={'Label':label,'ProgramArguments':[c['python_binary'],c['install_base']+'/supervisor.py'],'RunAtLoad':True,'KeepAlive':True,'ThrottleInterval':15,'StandardOutPath':c['install_base']+'/private/supervisor.log','StandardErrorPath':c['install_base']+'/private/supervisor-error.log'}
  (out/(label+'.plist')).write_bytes(plistlib.dumps(job))

@@ -1,0 +1,46 @@
+{
+  "signatureVerification": [
+    {
+      "architecture": "amd64",
+      "version": "0.1.4777",
+      "minimumMacOS": "12.0",
+      "signatureVerified": true,
+      "sha256": "sha256:5c6dd6299c30da2537369615efc1988cb3ed25d1580897e511a66f7e23989dfc"
+    },
+    {
+      "architecture": "arm64",
+      "version": "0.1.4777",
+      "minimumMacOS": "12.0",
+      "signatureVerified": true,
+      "sha256": "sha256:22b19bc89830c062d461642cdc446970c2a3a3d921f427de147a40eabf05245f"
+    }
+  ],
+  "runtime": {
+    "amd64": {
+      "passed": true,
+      "isolated": true,
+      "upstream": "synthetic loopback HTTP",
+      "version": "0.1.4777",
+      "checks": [
+        "public_message_responses_group_route",
+        "tool_call_and_result_ids_preserved",
+        "stream_completed_through_messages_responses_bridge"
+      ],
+      "productionChanged": false,
+      "userToolCommandsExecuted": false
+    },
+    "arm64": {
+      "passed": true,
+      "isolated": true,
+      "upstream": "synthetic loopback HTTP",
+      "version": "0.1.4777",
+      "checks": [
+        "public_message_responses_group_route",
+        "tool_call_and_result_ids_preserved",
+        "stream_completed_through_messages_responses_bridge"
+      ],
+      "productionChanged": false,
+      "userToolCommandsExecuted": false
+    }
+  }
+}

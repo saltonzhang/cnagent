@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+if [ "$(/usr/bin/id -un)" != '@@OPERATOR_USER@@' ]; then
+  echo 'Open this entry from your ordinary macOS administrator desktop.'
+  exit 1
+fi
+printf '\nStarting a fresh controlled JP Agent shell...\n'
+exec /usr/bin/sudo "@@INSTALL_BASE@@/launch" shell

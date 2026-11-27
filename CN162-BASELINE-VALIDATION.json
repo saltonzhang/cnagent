@@ -1,0 +1,15 @@
+{
+  "version": "3.2.3",
+  "liveCN162ReadOnlyVerified": true,
+  "model": "sonnet",
+  "aliasTarget": "remote-magpie/group/cn-default",
+  "effortLevel": null,
+  "effortEnvironmentForced": false,
+  "launcherSHA256": "fa6573d89ec70b54e9dfd8cdc64a7c426fde4d0204091605f505a6634f8a2be0",
+  "modelOrEffortLocksAdded": false,
+  "targetForSharedGroup": "JP current selection, last verified Sonnet 5.5",
+  "actualCN162MagpieVersion": "0.1.4777",
+  "factoryFrontendVersion": "0.1.4777",
+  "existingCNBinaryUpgradePerformed": false,
+  "productionCN162OrJPChanged": false
+}
