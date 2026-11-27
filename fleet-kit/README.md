@@ -1,4 +1,4 @@
-# CN installer kit v3.2.1 — no JP login from CN
+# CN installer kit v3.2.2 — no JP login from CN
 
 Read archive-root `CN-MAC-AI-DEPLOYMENT.md`. On a new CN Mac, its ordinary administrator runs `bash install.sh`. All baseline software is bundled for arm64/Intel. The installer prepares local accounts/software and exports a public device request, then reports **awaiting_admin_access_bundle**, not success.
 
@@ -15,3 +15,5 @@ Default model is group/cn-default, centrally managed on JP, actual model is what
 Issuance now requires an explicit --period day|week|month with positive --tokens/--cost, or an explicitly approved --unlimited. Budget setup and verification must succeed before delivery. Use admin/manage_budget.py for per-device status, preview and changes. No current production budgets are changed by installing this kit. See AI-INSTALL-PROMPT.md and AI-ADMIN-PROMPT.md at archive root.
 
 Default controlled process TZ is Asia/Tokyo. Existing managed v3.1.1/v3.2.0 CNs use setup/set_agent_timezone.py preview then --apply, or the small CN-MAC-JST-UPDATE.zip; do not reinstall. System timezone/locale and credentials are unchanged. Reopen the controlled shell; this is not a block on reading host metadata. Legacy unmanaged pilots are refused.
+
+Agent-only localtime guard: load the current network sandbox and append a deny on /etc/localtime and /private/etc/localtime; service policy and host timezone remain unchanged. This does not guarantee complete host location secrecy. Old conversation data is not removed.

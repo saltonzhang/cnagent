@@ -1,0 +1,22 @@
+{
+  "version": "3.2.2",
+  "scope": "CN162 actual Agent; fresh managed-CN installation not performed",
+  "twoPaths": [
+    "/etc/localtime",
+    "/private/etc/localtime"
+  ],
+  "directReadlinkLstatReadDenied": true,
+  "shellReadlinkStatLsTargetNotReturned": true,
+  "defaultDate": "JST +0900",
+  "PythonDefaultTZ": "Asia/Tokyo",
+  "CoreFoundationAfterUnsetTZ": "GMT fallback in tested probe, not an all-API guarantee",
+  "actualClaudeVersion": "2.1.198",
+  "actualModelReplyOK": true,
+  "proxyHEADStatus": 200,
+  "networkProfileAndCredentialsUnchanged": true,
+  "hostTimezoneUnchanged": true,
+  "servicesRestarted": false,
+  "newShellAndNewConversationRequired": true,
+  "oldHistoryCleared": false,
+  "CN162LauncherAfterSHA256": "fa6573d89ec70b54e9dfd8cdc64a7c426fde4d0204091605f505a6634f8a2be0"
+}

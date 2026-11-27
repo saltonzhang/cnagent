@@ -20,10 +20,15 @@ terminal_color=${COLORTERM:-}
 case "$terminal_color" in truecolor|24bit) ;; *) terminal_color=;; esac
 if [ -t 0 ]; then /bin/stty erase '^?' iutf8; fi
 case "$choice" in shell) command=/bin/zsh;; *) command="@@AGENT_HOME@@/.local/bin/$choice";; esac
+
+# Read the current network sandbox, then add Agent-only host timezone restrictions.
+agent_profile=$(/bin/cat "$base/controlled.sb")
+agent_profile+=$'\n(deny file-read* (regex #"^(/private)?/etc/localtime$"))\n'
+
 exec /usr/bin/sudo -u @@AGENT_USER@@ /usr/bin/env -i TZ=Asia/Tokyo HOME=@@AGENT_HOME@@ USER=@@AGENT_USER@@ LOGNAME=@@AGENT_USER@@ \
  PATH=@@AGENT_HOME@@/.local/bin:@@PYTHON_BIN_DIR@@:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin \
  TERM="$terminal_type" TERM_PROGRAM="$terminal_program" COLORTERM="$terminal_color" LANG="$terminal_locale" LC_CTYPE="$terminal_locale" \
  HTTP_PROXY=http://127.0.0.1:@@WEB_PROXY_PORT@@ HTTPS_PROXY=http://127.0.0.1:@@WEB_PROXY_PORT@@ \
  http_proxy=http://127.0.0.1:@@WEB_PROXY_PORT@@ https_proxy=http://127.0.0.1:@@WEB_PROXY_PORT@@ \
  NO_PROXY=localhost,127.0.0.1,::1 no_proxy=localhost,127.0.0.1,::1 \
- /usr/bin/sandbox-exec -f "$base/controlled.sb" "$command" "$@"
+ /usr/bin/sandbox-exec -p "$agent_profile" "$command" "$@"

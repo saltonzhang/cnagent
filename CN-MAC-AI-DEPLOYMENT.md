@@ -1,12 +1,12 @@
 # CN MAC 安装部署手册：交给 AI 执行
 
-手册/发行版 3.2.1（受控 Agent 默认日本时区）· 2026-11-26。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
+手册/发行版 3.2.2（受控 Agent 时区文件拦截）· 2026-11-27。配套：同版本 `CN-MAC-AI-DEPLOYMENT-KIT.zip`；另有仅交给 JP 管理员的 `JP-MAC-ENROLLMENT-ADMIN-KIT.zip`。
 
 ## 直接交给另一台电脑的 AI
 
 新 CN 不必先手动复制安装包。把下面这段指令发给有本机终端权限的 AI，它应先从 GitHub 读取本手册，再下载同版 Release。已复制文件的离线方式仍可使用。
 
-> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.2.1 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；管理员必须为本设备设置并核验额度，或明确批准不限额，之后才可交付签名接入包。拿到接入包后继续安装。不要自行决定额度或使用其他设备的 Key。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
+> 从 https://github.com/saltonzhang/cnagent/blob/main/CN-MAC-AI-DEPLOYMENT.md 读取手册，下载并校验 v3.2.2 的 CN-MAC-AI-DEPLOYMENT-KIT.zip（不要误用 JP 管理员工具包），根据这份手册帮我安装并配置好整套受控 Claude 环境，包括缺失的软件。实际执行，不要只解释方案。复用现有办公室 WireGuard 和 JP MAC。先读手册，验证安装包，再运行安装入口并完成实际验收。不要覆盖已有试点或修改 JP 的翻译、门禁、审计及两个开关。只在需要时进行本机管理员认证。CN 不得 SSH 登录 JP、索取 JP 登录凭据或配置 JP 登录密钥。先生成登记申请交给管理员；管理员必须为本设备设置并核验额度，或明确批准不限额，之后才可交付签名接入包。拿到接入包后继续安装。不要自行决定额度或使用其他设备的 Key。API Key 默认由接入包自动配置，若管理员选择不随包交付，则通过本机隐藏输入填写，不贴到聊天。只有所有必需验收通过后才告诉我可以使用。
 
 执行 AI 需要有这台 CN MAC 的终端执行权限；只有聊天能力不能安装。软件已随包携带，不要求新电脑预先安装 Homebrew、Node 或 Python。CN 只需要本机管理员授权；JP 的管理认证仅发生在管理员自己的电脑或 JP 本机，不能在新 CN 上进行。设备授权仍需要管理员审批：CN 先生成申请，管理员在 JP 签发接入包，CN 导入后继续。因此这是可恢复的两阶段安装，不是无需任何授权的自助入网。**包内不含任何密码、设备私钥、JP CA 私钥或 Gateway Key。**
 
@@ -101,8 +101,8 @@ fleet-kit/
 ```bash
 mkdir -p ~/Downloads/cnagent-v3.2.1
 cd ~/Downloads/cnagent-v3.2.1
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.1/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.1/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-AI-DEPLOYMENT-KIT.zip -o CN-MAC-AI-DEPLOYMENT-KIT.zip
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256 -o CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 shasum -a 256 -c CN-MAC-AI-DEPLOYMENT-KIT.zip.sha256
 unzip CN-MAC-AI-DEPLOYMENT-KIT.zip -d installer
 cd installer/fleet-kit
@@ -311,10 +311,10 @@ CN 安装步骤及签名接入包格式保持兼容；主要更新在 JP 签发�
 **已安装 v3.1.1 / v3.2.0 不要重装，不要重跑 install.sh 初始化。** 下载同版本 `CN-MAC-JST-UPDATE.zip` 和 `.sha256`，校验后读取小包说明并运行预览，再运行 `--apply`。更新只改受管理启动器的一处环境变量，不重启任何服务，不重新签发，不改 Key/证书/额度。
 
 ```bash
-mkdir -p ~/Downloads/cnagent-jst-v3.2.1
-cd ~/Downloads/cnagent-jst-v3.2.1
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.1/CN-MAC-JST-UPDATE.zip -o CN-MAC-JST-UPDATE.zip
-curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.1/CN-MAC-JST-UPDATE.zip.sha256 -o CN-MAC-JST-UPDATE.zip.sha256
+mkdir -p ~/Downloads/cnagent-jst-v3.2.2
+cd ~/Downloads/cnagent-jst-v3.2.2
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-JST-UPDATE.zip -o CN-MAC-JST-UPDATE.zip
+curl -fL --retry 3 https://github.com/saltonzhang/cnagent/releases/download/v3.2.2/CN-MAC-JST-UPDATE.zip.sha256 -o CN-MAC-JST-UPDATE.zip.sha256
 shasum -a 256 -c CN-MAC-JST-UPDATE.zip.sha256
 # 校验成功且目标目录不存在后再解压，禁止与其他版本混合。
 unzip CN-MAC-JST-UPDATE.zip -d updater
@@ -338,3 +338,14 @@ sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 set_agent
 
 管理员额度工具 v3.2.0 与本版兼容，JP 无需为时区更新重装、重启或重新签发。配额补设与时区更新是两个独立操作，安装旧设备更新包不会自动给设备分配额度。
 新 CN 提示词见 `AI-INSTALL-PROMPT.md`，旧 CN 增量更新提示词见 `AI-UPDATE-PROMPT.md`。尚待确认的 Claude 2.1.302/Codex 分类升级仍未包含。
+
+
+## v3.2.2：拦截宿主时区文件查询
+
+v3.2.1 只设置 TZ，仍可通过 `readlink /etc/localtime` 看到宿主系统时区。v3.2.2 在 Agent 启动器中实时读取现有网络沙箱，再叠加 `(deny file-read* (regex #"^(/private)?/etc/localtime$"))`，通过 sandbox-exec -p 应用于该 Agent 及其子进程。网络沙箱原文不删改；服务监督程序继续使用原 controlled.sb，不修改系统文件或时区。
+
+162 已实测：两条路径的 readlink/lstat/内容读取被拒绝，shell 的 readlink/stat/ls 不返回目标；date 和 Python 保持 JST，模型与代理真实请求正常。一个移除 TZ 后的 CoreFoundation 查询回落 GMT。没有证明所有系统 API/元数据路径均被封堵，不能声称彻底隐藏所在地。
+
+已装 v3.1.1、v3.2.0、v3.2.1 均使用同版小更新包，按上文先预览再 --apply；仅 TZ 已生效也会补上文件拦截。管理员 v3.2.0 额度工具不受影响，JP 不重启。通用工具仍拒绝接管无安装记录的历史试点；162 已单独接入，不需重复运行。
+
+退出旧 Claude 和受控 shell，新开会话验证；旧会话已经包含的 Asia/Shanghai 工具结果不会被删除，也不会让 Agent 忘记历史。以后完整 configure 使用 v3.2.2，以免旧模板覆盖新规则。保留语言，不保证星期文字变成英文。

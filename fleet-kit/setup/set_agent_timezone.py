@@ -2,6 +2,8 @@
 """Incremental, managed-CN-only launcher update. No keys, services or system TZ changes."""
 import argparse,datetime,fcntl,hashlib,json,os,pathlib,pwd,stat,subprocess,tempfile,sys
 sha=lambda b:hashlib.sha256(b).hexdigest()
+RULE='(deny file-read* (regex #"^(/private)?/etc/localtime$"))'
+BLOCK='\n# Read the current network sandbox, then add Agent-only host timezone restrictions.\nagent_profile=$(/bin/cat "$base/controlled.sb")\nagent_profile+=$\'\\n(deny file-read* (regex #"^(/private)?/etc/localtime$"))\\n\'\n'
 def safe(p,owner):
  p=pathlib.Path(p)
  if p.is_symlink() or not p.is_file():raise ValueError('unsafe_or_missing_file')
@@ -20,9 +22,15 @@ def atomic(p,data,uid,gid,mode):
 def transform(raw,home,user):
  s=raw.decode();prefix='/usr/bin/env -i ';old=prefix+'HOME='+home+' USER='+user+' LOGNAME='+user;new=prefix+'TZ=Asia/Tokyo HOME='+home+' USER='+user+' LOGNAME='+user
  if s.count(prefix)!=1:raise ValueError('ambiguous_launcher_environment')
- if s.count(new)==1:return raw
- if s.count(old)!=1 or 'TZ=' in s:raise ValueError('custom_launcher_requires_review')
- return s.replace(old,new).encode()
+ if s.count(new)!=1:
+  if s.count(old)!=1 or 'TZ=' in s:raise ValueError('custom_launcher_requires_review')
+  s=s.replace(old,new)
+ old_profile='-f "$base/controlled.sb"';new_profile='-p "$agent_profile"'
+ if s.count(new_profile)==1 and BLOCK in s:return s.encode()
+ if s.count(old_profile)!=1 or 'agent_profile=' in s or 'agent_profile+=' in s:raise ValueError('custom_launcher_requires_review')
+ marker='exec /usr/bin/sudo -u '
+ if s.count(marker)!=1:raise ValueError('launcher_identity_ambiguous')
+ return s.replace(marker,BLOCK+'\n'+marker).replace(old_profile,new_profile).encode()
 
 def migrate(config,apply=False,rollback=None,owner=0):
  config=safe(config,owner);c=json.loads(config.read_text());base=pathlib.Path(c['install_base']);private=base/'private'
@@ -41,7 +49,7 @@ def migrate(config,apply=False,rollback=None,owner=0):
   if not apply:return {'rollbackPreview':True,'willChangeOnly':str(live),'apply':False}
   atomic(live,old,s.st_uid,s.st_gid,stat.S_IMODE(s.st_mode));return {'rolledBack':True,'newShellRequired':True,'servicesRestarted':False}
  after=transform(before,c['agent_home'],c['agent_user'])
- out={'device_id':c['device_id'],'defaultTZ':'Asia/Tokyo','changeNeeded':after!=before,'apply':apply,'newShellRequired':True,'systemTimezoneChanged':False,'servicesRestarted':False}
+ out={'device_id':c['device_id'],'defaultTZ':'Asia/Tokyo','hostTimezoneFileGuard':True,'changeNeeded':after!=before,'apply':apply,'newShellRequired':True,'systemTimezoneChanged':False,'servicesRestarted':False}
  if not apply or before==after:return out
  # Syntax check only; never execute a copied root launcher while validating it.
  with tempfile.NamedTemporaryFile() as f:
