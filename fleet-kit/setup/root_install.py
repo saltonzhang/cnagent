@@ -170,6 +170,8 @@ def configure(c,j,save,b,payload):
   job=pathlib.Path('/Library/LaunchDaemons')/(LABEL+'.plist')
   if job.exists() and not j.get('configured'):raise ValueError('unmanaged_launchdaemon')
   write(job,(stage/(LABEL+'.plist')).read_bytes(),0o644)
+ from install_repo_sharing import install as install_repo_tools
+ j['repo_sharing_helper']=install_repo_tools(c,True);save()
  run(['/sbin/pfctl','-a',c['pf_anchor'],'-nf',b/'pilot.pf']);run(['/usr/bin/sandbox-exec','-f',b/'controlled.sb','/usr/bin/true']);run(['/usr/bin/plutil','-lint','/Library/LaunchDaemons/'+LABEL+'.plist'])
  j['configured']=True;j['accepted_bundle_sha256']=enrollment.sha(enrollment.canonical(envelope));j['accepted_request_sha256']=enrollment.sha(enrollment.canonical(request));save()
  # Only a newly provisioned CN job is started. No JP or other service restart.

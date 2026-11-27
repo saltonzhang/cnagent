@@ -1,0 +1,17 @@
+{
+  "version": "3.3.0",
+  "originalScript": "/Users/salton-/ai/share-git-repo.py",
+  "originalUnchanged": true,
+  "tests": {
+    "setup": 77,
+    "root": 9,
+    "liveCN162BothUserCommit": true,
+    "newTrackedAndAtomicSaveRefresh": true,
+    "ignoredEnvDenied": true,
+    "rollbackBeforeCommits": true,
+    "disposableHomesOnly": true
+  },
+  "productionProjectACLsModified": false,
+  "credentialsOrNetworkModified": false,
+  "freshFullInstallTested": false
+}

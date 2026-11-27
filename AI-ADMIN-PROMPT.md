@@ -1,9 +1,9 @@
-# 给 JP 管理 AI 的提示词（v3.2.3）
+# 给 JP 管理 AI 的提示词（v3.3.0）
 
 仅在 JP 本机或指定可信管理电脑执行，不能发给普通新 CN：
 
 ```text
-请使用 https://github.com/saltonzhang/cnagent/releases/tag/v3.2.3 的 JP-MAC-ENROLLMENT-ADMIN-KIT.zip 和同版校验文件，校验并阅读 JP-MAC-DEVICE-ENROLLMENT.md 及适用 AGENTS.md。
+请使用 https://github.com/saltonzhang/cnagent/releases/tag/v3.3.0 的 JP-MAC-ENROLLMENT-ADMIN-KIT.zip 和同版校验文件，校验并阅读 JP-MAC-DEVICE-ENROLLMENT.md 及适用 AGENTS.md。
 处理我提供的设备 .request.json，先验证来源和设备 ID，然后询问我该设备的额度周期（日/周/月）、Token 上限、是否包含缓存读取；金额仅为可选预估 USD 上限。没有我明确选择，不签发、不默认不限额。只有我明确批准不限额才使用 --unlimited。
 先预览，确认后用 --approve，为设备创建独立 Gateway Key、设置并核验限额成功后才交付签名 .access.json。失败时不交付。默认 Key 随包自动配置，不需要另外在官方 App 新建 Key。
 必须操作部署记录中的 JP 受控实例，保留现有 CA、核心、其他设备、模型组、翻译门禁和开关；不重启服务，不使用上游共享服务 Key 代替设备 Key。
@@ -12,3 +12,6 @@
 ```
 
 本版时区变化只在 CN 启动器；现有 v3.2.0 额度工具仍兼容。不要为时区更新重装 JP 或重签证书。
+
+
+JP 当前已启用设备证书与 Key 绑定。新设备签发后，还需管理员到内网管理台 https://10.9.8.30:43430 配置并启用该设备的模型、effort 与 5H Token 预算；未配置设备由入口拒绝。普通 CN 不需要管理台账号或 JP SSH。每个设备保持独立 Key；管理员脚本支持显式 --period 5h。v3.3.0 的本地仓库共享组件不改变 JP 签发权限。

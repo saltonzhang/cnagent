@@ -47,7 +47,7 @@ def update(binary,config,records,device,chosen=None,apply=False):
  record['budget']=chosen;atomic(file,record);out.update(changed=True,backup=str(snapshot),current_limit=updated.get('limit'),recorded_budget=chosen);return out
 
 def main():
- os.umask(0o077);p=argparse.ArgumentParser();p.add_argument('--device-id',required=True);p.add_argument('--period',choices=['day','week','month']);p.add_argument('--tokens',type=int);p.add_argument('--cost',type=float);p.add_argument('--cache-reads',action='store_true');p.add_argument('--unlimited',action='store_true');p.add_argument('--apply',action='store_true');a=p.parse_args()
+ os.umask(0o077);p=argparse.ArgumentParser();p.add_argument('--device-id',required=True);p.add_argument('--period',choices=['day','week','month','5h']);p.add_argument('--tokens',type=int);p.add_argument('--cost',type=float);p.add_argument('--cache-reads',action='store_true');p.add_argument('--unlimited',action='store_true');p.add_argument('--apply',action='store_true');a=p.parse_args()
  chosen=device_budget.policy(a.period,a.tokens,a.cost,a.cache_reads,a.unlimited) if any(x is not None for x in [a.period,a.tokens,a.cost]) or a.cache_reads or a.unlimited else None
  h=pathlib.Path.home();d=json.loads((h/'ai/magpie-migration/magpie-prompt-translator/.runtime/cutover/deployment.json').read_text());binary=pathlib.Path(d['binary']);config=pathlib.Path(d['configDir'])
  if hashlib.sha256(binary.read_bytes()).hexdigest()!=d['binarySHA256']:raise ValueError('JP_binary_pin_changed')

@@ -11,6 +11,11 @@ class BudgetTests(unittest.TestCase):
   for args in [(),('day',),('day',0),('day',-1),('day',True),('year',10),('day',None,float('nan')),('day',None,float('inf')),('day',None,-1)]:
    with self.subTest(args=args),self.assertRaises(ValueError):b.policy(*args)
   with self.assertRaises(ValueError):b.policy('day',100,unlimited=True)
+ def test_five_hour_policy_uses_native_hours_and_preserves_other_periods(self):
+  chosen=b.policy('5h',1000000,cache_reads=True)
+  self.assertTrue(b.matches({'limit':{'period':'hours','hours':5,'tokens':1000000,'cacheReads':True}},chosen))
+  self.assertFalse(b.matches({'limit':{'period':'hours','hours':4,'tokens':1000000,'cacheReads':True}},chosen))
+  self.assertFalse(b.matches({'limit':{'period':'day','tokens':1000000,'cacheReads':True}},chosen))
  def test_explicit_unlimited(self):self.assertEqual(b.policy(unlimited=True),{'mode':'unlimited'})
  def fixture(self,p):
   config=p/'magpie';config.mkdir();keys=[{'id':'a','name':'CN A','secret':'public-fake-A','models':['group/cn-default']},{'id':'b','name':'CN B','secret':'public-fake-B','limit':{'period':'day','tokens':42}}];(config/'caller-keys.json').write_text(json.dumps(keys));return config,keys

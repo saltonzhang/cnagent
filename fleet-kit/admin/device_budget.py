@@ -5,7 +5,7 @@ def policy(period=None,tokens=None,cost=None,cache_reads=False,unlimited=False):
  if unlimited:
   if period is not None or tokens is not None or cost is not None or cache_reads:raise ValueError('unlimited_conflicts_with_budget')
   return {'mode':'unlimited'}
- if period not in ['day','week','month']:raise ValueError('explicit_budget_required_choose_period_or_unlimited')
+ if period not in ['day','week','month','5h']:raise ValueError('explicit_budget_required_choose_period_or_unlimited')
  if tokens is not None and (type(tokens) is not int or not 0<tokens<=9007199254740991):raise ValueError('tokens_must_be_positive_integer')
  if cost is not None and (type(cost) not in [int,float] or not math.isfinite(cost) or cost<=0):raise ValueError('cost_must_be_positive_finite_USD')
  if type(cache_reads) is not bool:raise ValueError('invalid_cache_reads')
@@ -23,7 +23,7 @@ def matches(key,p):
  if p['mode']=='unlimited':return not limits
  if len(limits)!=1:return False
  l=limits[0]
- return l.get('period')==p['period'] and l.get('tokens',0)==p['tokens'] and l.get('cost',0)==p['cost'] and bool(l.get('cacheReads',False))==p['cache_reads'] and not l.get('models') and not l.get('days') and not l.get('hours')
+ return (l.get('period')==p['period'] or (p['period']=='5h' and l.get('period')=='hours' and l.get('hours')==5)) and l.get('tokens',0)==p['tokens'] and l.get('cost',0)==p['cost'] and bool(l.get('cacheReads',False))==p['cache_reads'] and not l.get('models') and not l.get('days') and (not l.get('hours') or p['period']=='5h')
 
 def read_key(config,keyid):
  import json

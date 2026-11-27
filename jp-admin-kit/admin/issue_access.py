@@ -69,7 +69,7 @@ def issue(request,out,hours=48,omit_key=False,budget_policy=None):
 
 def main():
  os.umask(0o077)
- p=argparse.ArgumentParser();p.add_argument('--request',required=True);p.add_argument('--out',required=True);p.add_argument('--approve',action='store_true');p.add_argument('--omit-api-key',action='store_true');p.add_argument('--valid-hours',type=int,default=48);p.add_argument('--period',choices=['day','week','month']);p.add_argument('--tokens',type=int);p.add_argument('--cost',type=float);p.add_argument('--cache-reads',action='store_true');p.add_argument('--unlimited',action='store_true');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--request',required=True);p.add_argument('--out',required=True);p.add_argument('--approve',action='store_true');p.add_argument('--omit-api-key',action='store_true');p.add_argument('--valid-hours',type=int,default=48);p.add_argument('--period',choices=['day','week','month','5h']);p.add_argument('--tokens',type=int);p.add_argument('--cost',type=float);p.add_argument('--cache-reads',action='store_true');p.add_argument('--unlimited',action='store_true');a=p.parse_args()
  request=enrollment.read(a.request);enrollment.validate_request(request,ROOT/'trust/jp-ca.pem')
  print(json.dumps({'device_id':request['device_id'],'CSR_digest':request['csr_sha256'],'route':request['route'],'approval_given':a.approve}),flush=True)
  if a.approve or any(x is not None for x in [a.period,a.tokens,a.cost]) or a.unlimited or a.cache_reads:

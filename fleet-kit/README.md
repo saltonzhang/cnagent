@@ -1,4 +1,4 @@
-# CN installer kit v3.2.3 — no JP login from CN
+# CN installer kit v3.3.0 — no JP login from CN
 
 Read archive-root `CN-MAC-AI-DEPLOYMENT.md`. On a new CN Mac, its ordinary administrator runs `bash install.sh`. All baseline software is bundled for arm64/Intel. The installer prepares local accounts/software and exports a public device request, then reports **awaiting_admin_access_bundle**, not success.
 
@@ -19,3 +19,5 @@ Default controlled process TZ is Asia/Tokyo. Existing managed v3.1.1/v3.2.0 CNs 
 Agent-only localtime guard: load the current network sandbox and append a deny on /etc/localtime and /private/etc/localtime; service policy and host timezone remain unchanged. This does not guarantee complete host location secrecy. Old conversation data is not removed.
 
 CN162 baseline: Claude model=sonnet; Sonnet/Opus/Haiku defaults all map to remote-magpie/group/cn-default. No forced effort or new model allowlist. Existing managed central-group devices can preview/apply setup/set_agent_defaults.py without re-enrollment; the small update bundles both defaults and timezone helpers. Fresh installs add a per-operator Desktop entry without overwriting unrelated files. No CN162 identity, Mobile mode, or special SSH grants are copied.
+
+Repository sharing: setup installs root-managed share-repo and public account context, never shares a repo automatically. See repo-sharing/README.md. Select paths with --share-repo, explicit Git identity, or invoke share-repo afterward. Existing CNs use setup/install_repo_sharing.py preview/apply; no reinstall, network/model restart or credential transfer. Only tracked files, explicit refresh; Home traversal is opt-in.

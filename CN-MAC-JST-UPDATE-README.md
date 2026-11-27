@@ -1,4 +1,4 @@
-# 已安装 CN：日本时区小更新包 v3.2.3
+# 已安装 CN：日本时区小更新包 v3.3.0
 
 适用：已完成 v3.1.1 / v3.2.0 / v3.2.1 的 v3 受管理安装。给受控启动器设置 `TZ=Asia/Tokyo` 并阻止受控进程查询宿主 localtime 文件，不安装软件、不修改系统时区/语言、不重签证书、不改 Key、额度、模型、代理或门禁，不重启服务。
 
@@ -40,7 +40,7 @@ sudo /Library/Frameworks/Python.framework/Versions/3.14/bin/python3.14 set_agent
 本版也适用于已装 v3.2.1：该版仅设置 TZ，没有拦截系统时区文件。应用后，受控 readlink/stat/ls/读取 localtime 应失败；date 仍 JST。退出旧进程并新开会话，旧历史不会被清除。此拦截只针对已验证的文件入口，不保证阻止所有位置推断。162 已单独接入，无需重复执行。
 
 
-## v3.2.3 also matches CN162 model defaults
+## v3.3.0 also matches CN162 model defaults
 
 The small archive now contains set_agent_defaults.py alongside set_agent_timezone.py. Run each with the installed Python 3.14 and sudo: first without flags to preview, then with --apply. The defaults tool sets model=sonnet and maps all three default aliases to remote-magpie/group/cn-default. It preserves effort/auth/permissions, providers and enrollment request. It requires an already configured central-group managed installation; no automatic adoption of legacy pilots.
 

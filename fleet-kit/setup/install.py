@@ -35,7 +35,7 @@ def bundle_import(path,request,ca_path,prompt=None):
  return imported
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--device-id');p.add_argument('--config');p.add_argument('--plan',action='store_true');p.add_argument('--no-public-check',action='store_true');p.add_argument('--access-bundle');p.add_argument('--request-out');a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--device-id');p.add_argument('--config');p.add_argument('--plan',action='store_true');p.add_argument('--no-public-check',action='store_true');p.add_argument('--access-bundle');p.add_argument('--request-out');p.add_argument('--share-repo',action='append',default=[]);p.add_argument('--git-name');p.add_argument('--git-email');p.add_argument('--allow-home-traverse',action='store_true');a=p.parse_args()
  if platform.system()!='Darwin' or os.getuid()==0:raise ValueError('run_on_CN_as_ordinary_administrator_not_root')
  user=pwd.getpwuid(os.getuid());c=dict(render.DEFAULT)
  if a.config:c.update(enrollment.read(a.config))
@@ -71,6 +71,13 @@ def main():
    print('把登记申请交给管理员。管理员在 JP 签发接入包后，用 --access-bundle /绝对路径/设备.access.json 继续；不要提供 JP 登录凭据。',flush=True);return
   check=run(['/usr/bin/sudo',sys.executable,str(stage/'setup/accept.py'),'--config',str(conf)]+(['--no-public-check'] if a.no_public_check else []));result=json.loads(check);print(json.dumps(result),flush=True)
   if not result.get('passed'):raise RuntimeError('acceptance_failed_do_not_claim_ready')
+ for repo in a.share_repo:
+  command=[str(pathlib.Path(c['install_base'])/'share-repo'),repo]
+  if a.git_name:command+=['--git-name',a.git_name]
+  if a.git_email:command+=['--git-email',a.git_email]
+  if a.allow_home_traverse:command+=['--allow-home-traverse']
+  if subprocess.run(command).returncode:raise RuntimeError('repository_sharing_incomplete_agent_install_preserved')
+ print('Repository helper: '+str(pathlib.Path(c['install_base'])/'share-repo')+'; select each repo explicitly. No repo/Home shared automatically.',flush=True)
  print('Installed. In iTerm2 choose JP Agent (WireGuard), then run claude. GUI acceptance remains required.',flush=True)
 if __name__=='__main__':
  try:main()

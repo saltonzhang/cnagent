@@ -1,15 +1,13 @@
-# 已安装 CN 增量配置更新提示词（v3.2.3）
+# 已安装 CN：只升级仓库共享组件（v3.3.0）
 
-在普通管理员账户中执行，不从非管理员 cnagent shell 尝试提权：
+适用于已有 3.1.1／3.2.x 或明确核实的旧试点；不重装、不重新登记，不改变现有 UID、Key、证书、模型、额度、网络和 Mobile/Office 模式。
 
 ```text
-这台 CN 已有 v3 受管理安装，请按 https://github.com/saltonzhang/cnagent/releases/tag/v3.2.3 对齐 162 当前配置，不要重装或重跑初始化。
-下载 CN-MAC-JST-UPDATE.zip 和同版 SHA256，校验后解压到独立目录，再校验 MANIFEST.sha256，阅读 README.md 和适用 AGENTS.md。这个小包同时含 set_agent_timezone.py、set_agent_defaults.py。
-用本机已安装的 Python 3.14 和 sudo，分别不带 --apply 运行两个工具预览；确认设备、账户和中央组匹配后，再分别加 --apply。
-目标：受控默认 TZ=Asia/Tokyo 并拒绝 localtime 文件查询；Claude 默认 model=sonnet，Sonnet/Opus/Haiku 三个默认别名都指向 remote-magpie/group/cn-default。不强制 effort、不隐藏菜单、不新增服务端模型白名单。
-保留系统时区、语言、证书、Key、额度、权限、effort、代理、其他供应商及已使用同一组时的登记申请。不要 SSH 登录 JP、不重签接入包、不升级 Claude、不替换正在运行的 Magpie。小更新只改配置，不代表前端二进制已升级；需要软件升级时单独准备备份与本机切换窗口。
-无安装记录、账户变化、路由不匹配或自定义环境冲突时停止调查，不能伪造安装记录。162 历史试点已处于此状态，不重复套用通用工具。
-保存两个备份路径，分别提供对应工具的 --rollback 预览/--apply 命令；后续配置变化时不得强行覆盖。
-退出旧 Claude 和旧父 shell，从普通账户执行 sudo "/Library/Application Support/CN-Agent-Egress/launch" shell，再新开 Claude 会话。实际确认 id 为 cnagent，readlink /etc/localtime 失败，date 显示 JST/+0900，普通账户时区不变；确认三个默认别名都映射同一 JP 组。
-旧历史中的已读时区不会被清除。这只保护已验证的文件入口，不保证隐藏所有本机元数据。未验证的项目如实列出，不能把旧会话仍然记得上海当作文件访问成功。
+请下载 https://github.com/saltonzhang/cnagent/releases/download/v3.3.0/CN-MAC-REPO-SHARING-UPDATE.zip 和同名 .sha256，校验 ZIP 及包内 MANIFEST.sha256，阅读 fleet-kit/repo-sharing/README.md 和适用 AGENTS.md。
+先检查本机已有的宿主账号、受控账号、启动器和 root 管理的 Python 3.9+。优先使用现有合格运行时，不为这个组件重装整个环境。用 setup/install_repo_sharing.py --operator-user 当前宿主账号预览，再按本次已授权范围加 --apply；只安装 root 管理 helper，不启动或重启任何模型、代理、PF 或网络服务，不复制任何凭据。
+安装组件本身不共享项目。先询问具体仓库路径及 Agent 的 Git 提交姓名/邮箱；只处理我明确选中的仓库。安全默认是已跟踪文件共享；排除 ignored、.env、SSH/GPG 等，遇到敏感项原权限过宽先停止核实。优先 /Users/Shared 专用项目目录；不得擅自开放 Home、加 --allow-home-traverse 或 safe.directory=*。明确说明共享 Git 历史和 hooks/config 的共同信任边界，父目录遍历需另行说明授权。
+使用 share-repo 配置、--refresh 一键刷新。新文件 git add／编辑器原子保存后需要刷新；不宣称会自动共享所有新文件。先在临时仓库和临时 HOME 验证双方读写、本地提交、忽略文件保留权限和回滚，不用真实项目做试验提交，不执行 git push。
+不顺带更改时区、默认模型、effort 或升级 Claude/Magpie。交付已安装组件版本、所选项目实际结果、刷新命令、私密操作记录位置和冲突保护回滚方法；未选项目时明确“工具就绪，项目共享待选择”。
 ```
+
+若用户另行要求日本时区／别名修复，才使用同版本独立的 `CN-MAC-JST-UPDATE.zip`，先阅读对应手册预览，再应用；本次仓库共享更新不要求它。

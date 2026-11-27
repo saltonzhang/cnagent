@@ -300,8 +300,7 @@
     "loadTest20Clients": false,
     "limits": [
       "actual usage settles after requests; small overshoot possible",
-      "cost is an estimate and unpriced requests need Token caps",
-      "certificate/key strict one-to-one binding not implemented"
+      "cost is an estimate and unpriced requests need Token caps"
     ],
     "coverage": [
       "missing/invalid quota rejected before registration",
@@ -359,5 +358,28 @@
     "signatureAndMinimumOSVerifiedBothArchitectures": true,
     "ClaudeCodeUpdated": false,
     "nativeFrontendChecksPassed": 6
+  },
+  "version": "3.3.0",
+  "repositorySharing": {
+    "trackedOnly": true,
+    "refreshSupported": true,
+    "operatorNotHardcoded": true,
+    "originalUserScriptPreserved": true,
+    "CN162RealUIDIsolatedTest": true,
+    "bothUsersReadWriteAndCommit": true,
+    "atomicSaveAndNewTrackedFileRefresh": true,
+    "ignoredEnvDenied": true,
+    "rollbackBeforeCommitsVerified": true,
+    "realUserGitConfigOrNetworkChanged": false,
+    "freshCNFullInstallationTested": false,
+    "setupTestsPassed": 77,
+    "rootTestsPassed": 9,
+    "rootManagedHelperInstalledOnCN162": true
+  },
+  "currentJPDevicePolicy": {
+    "certificateAndKeyBinding": true,
+    "modelAndEffortFixedServerSide": true,
+    "newlyIssuedDeviceRequiresAdminActivation": true,
+    "deployedSeparatelyFromCNInstaller": true
   }
 }
